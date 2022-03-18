@@ -1,0 +1,37 @@
+{
+    "root": "src",
+    "output": "dist",
+    "prefix": "ps",
+    "debug": false,
+    "assets": [
+        "images",
+        "videos",
+        "html"
+    ],
+    "es6": {
+        "format": "umd",
+        "module": "PhotoStory"
+    },
+    "files": {
+        "styles": {
+            "src": "{$config.root}/scss/styles.scss",
+            "output": "{$config.output}/css/styles.css"
+        },
+        "scripts": {
+            "src": "{$config.root}/js/core.js",
+            "output": "{$config.output}/js/photo-story.js"
+        },
+        "images": {
+            "src": "{$config.root}/images/**/*",
+            "output": "{$config.output}/images/"
+        },
+        "videos": {
+            "src": "{$config.root}/videos/**/*",
+            "output": "{$config.output}/videos/"
+        },
+        "html": {
+            "src": "{$config.root}/**/*.html",
+            "output": "{$config.output}/"
+        }
+    }
+}

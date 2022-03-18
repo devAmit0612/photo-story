@@ -1,0 +1,18 @@
+:root {
+    --ps-prefix: #{$prefix};
+    --ps-lightbox-color: #{$lightbox-color};
+
+    --ps-backdrop-bg: #{$backdrop-bg};
+    --ps-backdrop-blur: #{$backdrop-blur};
+    
+    --ps-toolbar-padding: #{$toolbar-padding};
+
+    --ps-button-bg: #{$button-bg};
+    --ps-button-color: #{$button-color};
+    --ps-button-padding: #{$button-padding};
+    --ps-button-border: #{$button-border};
+    --ps-button-border-radius: #{$button-border-radius};
+    --ps-button-icon-size: #{$button-icon-size};
+    
+    --ps-nav-button-space: #{$nav-button-space};
+}

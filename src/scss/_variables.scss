@@ -1,0 +1,21 @@
+$prefix: 'ps-';
+
+// Color
+$white: #ffffff;
+$black: #000000;
+
+$lightbox-color: $white !default;
+
+$backdrop-bg: rgba($black, .8) !default;
+$backdrop-blur: 8px !default;
+
+$toolbar-padding: 8px 16px !default;
+
+$button-bg: rgba($black, .7) !default;
+$button-color: inherit !default;
+$button-border-radius: 4px !default;
+$button-border: none !default;
+$button-padding: 8px !default;
+$button-icon-size: 16px !default;
+
+$nav-button-space: $button-icon-size !default;

@@ -1,0 +1,92 @@
+@import "variables";
+@import "root";
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+}
+
+.#{$prefix}lightbox {
+    color: var(--ps-lightbox-color);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+
+    &__backdrop {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: var(--ps-backdrop-bg);
+        backdrop-filter: blur(var(--ps-backdrop-blur));
+        backface-visibility: hidden;
+    }
+
+    &__toolbar,
+    &__toolbar__options {
+        display: flex;
+    }
+
+    &__toolbar {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        padding: var(--ps-toolbar-padding);
+        color: var(--ps-toolbar-color);
+        align-items: center;
+
+        &__options {
+            margin-left: auto;
+            > * {
+                display: inline-flex;
+                align-items: center;
+            }
+            .#{$prefix}button {
+                + .#{$prefix}button {
+                    margin-left: 8px;
+                }
+            }
+        }
+    }
+}
+
+.#{$prefix}button {
+    appearance: none;
+    color: var(--ps-button-color);
+    background-color: var(--ps-button-bg);
+    border: var(--ps-button-border);
+    border-radius: var(--ps-button-border-radius);
+    padding: var(--ps-button-padding);
+    cursor: pointer;
+    svg {
+        width: var(--ps-button-icon-size);
+        height: var(--ps-button-icon-size);
+    }
+
+    &#{&}--next,
+    &#{&}--prev {
+        position: absolute;
+        display: inline-flex;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    &#{&}--next {
+        left: var(--ps-nav-button-space);
+    }
+
+    &#{&}--prev {
+        right: var(--ps-nav-button-space);
+    }
+}

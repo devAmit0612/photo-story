@@ -1,0 +1,57 @@
+{
+	"name": "photo-story",
+	"version": "1.0.0",
+	"description": "Modern light box plugin for images and videos",
+	"scripts": {
+		"build": "gulp build",
+		"prod": "gulp prod",
+		"serve": "gulp serve"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/devAmit0612/photo-story.git"
+	},
+	"keywords": [
+		"lightbox",
+		"responsive",
+		"popup",
+		"gallery",
+		"photo",
+		"image",
+		"video",
+		"touch",
+		"zoom",
+		"tap"
+	],
+	"author": "Amit Chauhan",
+	"email": "chauhanammy@gmail.com",
+	"license": "The MIT License (MIT)",
+	"bugs": {
+		"url": "https://github.com/devAmit0612/photo-story/issues"
+	},
+	"homepage": "https://github.com/devAmit0612/photo-story",
+	"browserslist": [
+		"last 10 versions"
+	],
+	"devDependencies": {
+		"@babel/cli": "^7.15.4",
+		"@babel/core": "^7.15.5",
+		"@babel/plugin-transform-runtime": "^7.15.0",
+		"@babel/preset-env": "^7.15.4",
+		"@babel/runtime": "^7.15.4",
+		"browser-sync": "^2.27.7",
+		"del": "^6.0.0",
+		"gulp": "^4.0.2",
+		"gulp-autoprefixer": "^8.0.0",
+		"gulp-clean-css": "^4.3.0",
+		"gulp-rename": "^2.0.0",
+		"gulp-sass": "^5.0.0",
+		"gulp-uglify-es": "^3.0.0",
+		"rollup": "^2.56.3",
+		"rollup-plugin-babel": "^4.4.0",
+		"rollup-plugin-commonjs": "^10.1.0",
+		"rollup-plugin-json": "^4.0.0",
+		"rollup-plugin-node-resolve": "^5.2.0",
+		"sass": "^1.42.1"
+	}
+}

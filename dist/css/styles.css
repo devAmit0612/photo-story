@@ -1,0 +1,110 @@
+:root {
+  --ps-prefix: ps-;
+  --ps-lightbox-color: #ffffff;
+  --ps-backdrop-bg: rgba(0, 0, 0, 0.8);
+  --ps-backdrop-blur: 8px;
+  --ps-toolbar-padding: 8px 16px;
+  --ps-button-bg: rgba(0, 0, 0, 0.7);
+  --ps-button-color: inherit;
+  --ps-button-padding: 8px;
+  --ps-button-border: none;
+  --ps-button-border-radius: 4px;
+  --ps-button-icon-size: 16px;
+  --ps-nav-button-space: 16px;
+}
+
+*,
+*::before,
+*::after {
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.ps-lightbox {
+  color: var(--ps-lightbox-color);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+}
+.ps-lightbox__backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--ps-backdrop-bg);
+  -webkit-backdrop-filter: blur(var(--ps-backdrop-blur));
+          backdrop-filter: blur(var(--ps-backdrop-blur));
+  -webkit-backface-visibility: hidden;
+          backface-visibility: hidden;
+}
+.ps-lightbox__toolbar, .ps-lightbox__toolbar__options {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+.ps-lightbox__toolbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: var(--ps-toolbar-padding);
+  color: var(--ps-toolbar-color);
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+.ps-lightbox__toolbar__options {
+  margin-left: auto;
+}
+.ps-lightbox__toolbar__options > * {
+  display: -webkit-inline-box;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+.ps-lightbox__toolbar__options .ps-button + .ps-button {
+  margin-left: 8px;
+}
+
+.ps-button {
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
+  color: var(--ps-button-color);
+  background-color: var(--ps-button-bg);
+  border: var(--ps-button-border);
+  border-radius: var(--ps-button-border-radius);
+  padding: var(--ps-button-padding);
+  cursor: pointer;
+}
+.ps-button svg {
+  width: var(--ps-button-icon-size);
+  height: var(--ps-button-icon-size);
+}
+.ps-button.ps-button--next, .ps-button.ps-button--prev {
+  position: absolute;
+  display: -webkit-inline-box;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+      -ms-transform: translateY(-50%);
+          transform: translateY(-50%);
+}
+.ps-button.ps-button--next {
+  left: var(--ps-nav-button-space);
+}
+.ps-button.ps-button--prev {
+  right: var(--ps-nav-button-space);
+}

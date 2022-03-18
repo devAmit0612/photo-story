@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Photo Story</title>
+    
+    <link rel="stylesheet" href="css/styles.css">
+
+</head>
+<body>
+    <div class="gallery">
+        <a href="images/thumb/thumb-1.jpg" rel="g1">
+            <img src="images/thumb/thumb-1.jpg" alt="">
+        </a>
+        <a href="images/thumb/thumb-2.jpg" rel="g1">
+            <img src="images/thumb/thumb-2.jpg" alt="">
+        </a>
+    </div>
+
+    <div class="gallery">
+        <a href="images/thumb/thumb-3.jpg" rel="g2">
+            <img src="images/thumb/thumb-3.jpg" alt="">
+        </a>
+        <a href="images/thumb/thumb-4.jpg" rel="nofollow" title='<h5>Title</h5>' data-ps-captions="lorem">
+            <img src="images/thumb/thumb-4.jpg" alt="">
+        </a>
+        <a href="images/thumb/thumb-5.jpg" rel="g2">
+            <img src="images/thumb/thumb-5.jpg" alt="">
+        </a>
+    </div>
+
+    <script src="js/photo-story.js"></script>
+    <script>
+        var ps = new PhotoStory('.gallery', {
+            fullscreen: false,
+            navigation: true
+        });
+    </script>
+</body>
+</html>
