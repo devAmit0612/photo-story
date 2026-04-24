@@ -1,0 +1,19 @@
+@use "variables" as *;
+
+:root {
+  --#{$prefix}lightbox-color: #{$lightbox-color};
+
+  --#{$prefix}backdrop-bg: #{$backdrop-bg};
+  --#{$prefix}backdrop-blur: #{$backdrop-blur};
+
+  --#{$prefix}toolbar-padding: #{$toolbar-padding};
+
+  --#{$prefix}button-bg: #{$button-bg};
+  --#{$prefix}button-color: #{$button-color};
+  --#{$prefix}button-padding: #{$button-padding};
+  --#{$prefix}button-border: #{$button-border};
+  --#{$prefix}button-border-radius: #{$button-border-radius};
+  --#{$prefix}button-icon-size: #{$button-icon-size};
+
+  --#{$prefix}nav-button-space: #{$nav-button-space};
+}
