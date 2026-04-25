@@ -1,16 +1,55 @@
 {
   "name": "photo-story",
-  "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "Modern light box plugin for images and videos",
   "type": "module",
+  "main": "./dist/photo-story.umd.js",
+  "module": "./dist/photo-story.es.js",
+  "types": "./dist/index.d.ts",
+  "style": "./dist/photo-story.css",
+  "exports": {
+    ".": {
+      "import": "./dist/photo-story.es.js",
+      "require": "./dist/photo-story.umd.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./style.css": "./dist/photo-story.css"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "format": "prettier . --write",
+    "format:check": "prettier . --check"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/devAmit0612/photo-story.git"
+  },
+  "keywords": [
+    "lightbox",
+    "responsive",
+    "popup",
+    "gallery",
+    "photo",
+    "image",
+    "video",
+    "touch",
+    "zoom",
+    "tap"
+  ],
+  "author": "Amit Chauhan",
+  "email": "chauhanammy@gmail.com",
+  "license": "The MIT License (MIT)",
+  "bugs": {
+    "url": "https://github.com/devAmit0612/photo-story/issues"
+  },
+  "homepage": "https://github.com/devAmit0612/photo-story",
   "devDependencies": {
+    "prettier": "^3.8.3",
     "sass": "^1.99.0",
     "typescript": "~6.0.2",
-    "vite": "^8.0.10"
+    "vite": "^8.0.10",
+    "vite-plugin-dts": "^4.5.4"
   }
 }
