@@ -7,18 +7,20 @@ $black: #000000;
 $dark: #020618;
 $pink: #e60076;
 
+$zIndex: 9999 !default;
 $lightbox-color: $white !default;
 
 $backdrop-bg: rgba($black, 0.8) !default;
-$backdrop-blur: 0.5rem !default;
+$backdrop-blur: 0 !default;
 
-$toolbar-padding: 0.5rem 1rem !default;
+$toolbar-padding-x: 1rem !default;
+$toolbar-padding-y: 1rem !default;
 
-$button-bg: rgba($black, 0.7) !default;
-$button-color: inherit !default;
-$button-border-radius: 4px !default;
+$button-bg: rgba($black, 0.5) !default;
+$button-color: $white !default;
+$button-border-radius: 0.375rem !default;
 $button-border: none !default;
 $button-padding: 0.5rem !default;
-$button-icon-size: 1rem !default;
+$button-icon-size: 1.25rem !default;
 
 $nav-button-space: $button-icon-size !default;

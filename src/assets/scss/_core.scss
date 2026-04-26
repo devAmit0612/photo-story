@@ -1,15 +1,15 @@
 @use 'variables' as *;
 
-.#{$prefix}lightbox {
-  color: var(--#{$prefix}lightbox-color);
+.ps {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
-  height: 100vh;
+  height: 100%;
+  z-index: var(--#{$prefix}z-index);
 
   &__backdrop {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
@@ -22,6 +22,7 @@
   &__toolbar,
   &__toolbar__options {
     display: flex;
+    align-items: center;
   }
 
   &__toolbar {
@@ -29,51 +30,45 @@
     top: 0;
     left: 0;
     width: 100%;
-    padding: var(--#{$prefix}toolbar-padding);
+    padding: var(--#{$prefix}toolbar-padding-y) var(--#{$prefix}toolbar-padding-x);
     color: var(--#{$prefix}toolbar-color);
-    align-items: center;
 
     &__options {
+      gap: 0.5rem;
       margin-left: auto;
-      > * {
-        display: inline-flex;
-        align-items: center;
-      }
-      .#{$prefix}button {
-        + .#{$prefix}button {
-          margin-left: 8px;
-        }
-      }
     }
   }
-}
 
-.#{$prefix}button {
-  appearance: none;
-  color: var(--#{$prefix}button-color);
-  background-color: var(--#{$prefix}button-bg);
-  border: var(--#{$prefix}button-border);
-  border-radius: var(--#{$prefix}button-border-radius);
-  padding: var(--#{$prefix}button-padding);
-  cursor: pointer;
-  svg {
-    width: var(--#{$prefix}button-icon-size);
-    height: var(--#{$prefix}button-icon-size);
-  }
-
-  &#{&}--next,
-  &#{&}--prev {
-    position: absolute;
+  // Button
+  &__button {
     display: inline-flex;
-    top: 50%;
-    transform: translateY(-50%);
-  }
+    align-items: center;
+    appearance: none;
+    color: var(--#{$prefix}button-color);
+    background-color: var(--#{$prefix}button-bg);
+    border: var(--#{$prefix}button-border);
+    border-radius: var(--#{$prefix}button-border-radius);
+    padding: var(--#{$prefix}button-padding);
+    cursor: pointer;
+    svg {
+      width: var(--#{$prefix}button-icon-size);
+      height: var(--#{$prefix}button-icon-size);
+    }
 
-  &#{&}--next {
-    left: var(--#{$prefix}nav-button-space);
-  }
+    &#{&}--next,
+    &#{&}--prev {
+      position: absolute;
+      display: inline-flex;
+      top: 50%;
+      transform: translateY(-50%);
+    }
 
-  &#{&}--prev {
-    right: var(--#{$prefix}nav-button-space);
+    &#{&}--next {
+      left: var(--#{$prefix}nav-button-space);
+    }
+
+    &#{&}--prev {
+      right: var(--#{$prefix}nav-button-space);
+    }
   }
 }
