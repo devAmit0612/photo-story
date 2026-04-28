@@ -1,3 +1,5 @@
+import { getDocument, getWindow } from 'ssr-window';
+
 import {
   mediaNames,
   type CurrentObject,
@@ -7,11 +9,12 @@ import {
   type MediaType,
 } from '../types';
 
-// Helper to check if it is browser environment
-export const isBrowser = typeof window !== 'undefined' && typeof document !== 'undefined';
+export const prefix = 'ps';
 
 export function checkPassiveListener(): boolean {
-  if (!isBrowser) return false;
+  const window = getWindow();
+
+  if (!window.addEventListener || !window.removeEventListener) return false;
 
   let supportsPassive = false;
   try {
@@ -106,7 +109,7 @@ export function getElement(
     return (obj as JQueryElement).jquery ? (obj as JQueryElement)[0] : (obj as HTMLElement);
   }
   if (typeof obj === 'string' && obj.trim().length > 0) {
-    if (!isBrowser) return null;
+    const document = getDocument();
     return document.querySelectorAll<HTMLElement>(obj);
   }
   return null;
@@ -224,6 +227,17 @@ export function isElement(obj: unknown): obj is HTMLElement | JQueryElement {
   return typeof (obj as HTMLElement).nodeType !== 'undefined';
 }
 
+export function isNodeList(obj: unknown): obj is NodeListOf<HTMLElement> {
+  if (!obj || typeof obj !== 'object') {
+    return false;
+  }
+
+  return (
+    typeof (obj as NodeListOf<HTMLElement>).length === 'number' &&
+    typeof (obj as NodeListOf<HTMLElement>).item === 'function'
+  );
+}
+
 export function isObject(obj: unknown): obj is Record<string, unknown> {
   return (
     typeof obj === 'object' &&
@@ -234,7 +248,6 @@ export function isObject(obj: unknown): obj is Record<string, unknown> {
 }
 
 function isCollection(collection: unknown): HTMLElement | undefined {
-  // SSR Safe: Check if HTMLCollection exists before using instanceof
   if (
     typeof HTMLCollection !== 'undefined' &&
     collection instanceof HTMLCollection &&

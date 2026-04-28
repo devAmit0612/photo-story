@@ -1,3 +1,4 @@
+import { getDocument } from 'ssr-window';
 import {
   extend,
   deleteProps,
@@ -6,7 +7,9 @@ import {
   getGallery,
   getGalleryGroup,
   getGalleryType,
+  isNodeList,
   isObject,
+  prefix,
 } from './shared/utils';
 
 import { type Options, type GalleryItem } from './types';
@@ -17,11 +20,12 @@ import eventsProto from './prototypes/events';
 import eventEmitter from './prototypes/event-emitter';
 import fullscreen from './prototypes/fullscreen';
 import animation from './prototypes/animation';
+import loader from './prototypes/loader';
+import slides from './prototypes/slides';
+import toolbar from './prototypes/toolbar';
 
 import extendModuleDefaults from './shared/extend-module';
 import defaults from './defaults';
-
-const prefix = 'ps';
 
 // Group prototypes for the mixin loop
 const prototypes: Record<string, any> = {
@@ -30,6 +34,9 @@ const prototypes: Record<string, any> = {
   eventEmitter,
   fullscreen,
   animation,
+  loader,
+  toolbar,
+  slides,
 };
 
 // Define the shape of a PhotoStory Module
@@ -59,8 +66,12 @@ interface PhotoStory {
   enterFullscreen(): void;
   exitFullscreen(): void;
   fullscreen(): void;
-  fadeIn(el: HTMLElement, cb?: () => void, duration?: number): void;
-  fadeOut(el: HTMLElement, cb?: () => void, duration?: number): void;
+  fadeIn(el: HTMLElement, cb?: () => void, duration?: number, easing?: string): void;
+  fadeOut(el: HTMLElement, cb?: () => void, duration?: number, easing?: string): void;
+  createLoader(): HTMLElement;
+  showLoader(): void;
+  hideLoader(): void;
+  mount(cb?: () => void): void;
   setSlides(gallery: GalleryItem[]): void;
 }
 
@@ -97,7 +108,7 @@ class PhotoStory {
     if (rawElement) {
       const retrieved = typeof rawElement === 'string' ? getElement(rawElement) : rawElement;
 
-      if (retrieved instanceof NodeList || Array.isArray(retrieved)) {
+      if (isNodeList(retrieved) || Array.isArray(retrieved)) {
         this.element = Array.from(retrieved as ArrayLike<HTMLElement>);
       } else if (retrieved) {
         this.element = [retrieved as HTMLElement];
@@ -166,81 +177,29 @@ class PhotoStory {
   build(): void {
     if (!this.galleryId || !this.options.gallery[this.galleryId]) return;
 
+    const document = getDocument();
+    if (!document.body?.appendChild) return;
+
     const psWrapper = this.createEl();
     psWrapper.id = `${prefix}_wrapper`;
 
     const gallery = this.options.gallery[this.galleryId];
     const backdrop = this.createEl(`${prefix}__backdrop`);
+    const loaderEl = this.createLoader();
 
     this.el = this.createEl(`${prefix}`);
 
     const tb = this.toolbar(gallery);
     psWrapper.append(backdrop, tb);
-    this.el.append(psWrapper);
+    this.el.append(psWrapper, loaderEl);
 
-    if (typeof this.setSlides === 'function') {
-      this.setSlides(gallery);
-    }
+    // if (typeof this.setSlides === 'function') {
+    //   this.setSlides(gallery);
+    // }
 
     document.body.appendChild(this.el);
-    this.fadeIn(psWrapper, undefined, this.options.backdropDuration);
-  }
-
-  toolbar(gallery: GalleryItem[]): HTMLElement {
-    this.tools = {};
-    const toolbar = this.createEl(`${prefix}__toolbar`);
-    const options = this.createEl(`${prefix}__toolbar__options`);
-    const closeButton = this.createEl(`${prefix}__button`, 'button') as HTMLButtonElement;
-    closeButton.type = 'button';
-    closeButton.ariaLabel = 'Close gallery';
-    closeButton.innerHTML = this.options.template.close;
-
-    this.attachEvents(closeButton, this.events.click, () => {
-      this.close();
-    });
-
-    this.tools.close = closeButton;
-
-    if (this.options.showCounter) {
-      const galleryItems = gallery.length;
-      const html = `<span id="${this.getIdName('ps_current_slide')}">${this.currentIndex + 1}</span><span> / ${galleryItems}</span>`;
-      this.tools.counter = this.createEl(`${prefix}__counter`);
-      this.tools.counter.innerHTML = html;
-      toolbar.appendChild(this.tools.counter);
-    }
-
-    if (this.options.fullscreen && this.options.template.enterFullscreen) {
-      const fsButton = this.createEl(`${prefix}__button`, 'button') as HTMLButtonElement;
-      fsButton.type = 'button';
-      fsButton.ariaLabel = 'Fullscreen';
-      fsButton.innerHTML = this.options.template.enterFullscreen;
-
-      this.attachEvents(fsButton, this.events.click, () => {
-        this.fullscreen();
-      });
-
-      this.tools.fullscreen = fsButton;
-      options.appendChild(this.tools.fullscreen);
-    }
-
-    if (this.options.download) {
-      const downloadButton = this.createEl(`${prefix}__button`, 'button') as HTMLButtonElement;
-      downloadButton.type = 'button';
-      downloadButton.ariaLabel = 'Download image';
-      downloadButton.innerHTML = this.options.template.download;
-
-      this.attachEvents(downloadButton, this.events.click, () => {
-        this.downloadURL();
-      });
-
-      this.tools.download = downloadButton;
-      options.appendChild(this.tools.download);
-    }
-
-    options.appendChild(this.tools.close);
-    toolbar.appendChild(options);
-
-    return toolbar;
+    this.showLoader();
+    this.fadeIn(psWrapper, undefined, this.options.backdrop.duration, this.options.backdrop.easing);
   }
 
   init(): boolean | void {
@@ -273,6 +232,7 @@ class PhotoStory {
 
     this.currentIndex = 0;
     this.galleryId = null;
+    const document = getDocument();
 
     // Detach events from tools
     Object.keys(this.tools).forEach((tool) => {
@@ -286,14 +246,22 @@ class PhotoStory {
     const psWrapper = (getElement(`#${prefix}_wrapper`) || []) as HTMLElement[];
     if (psWrapper.length === 0) return;
 
+    // if (this.options.reveal.effect === 'default') {
+    //   const slides = document.getElementById(`${prefix}_slides`) as HTMLElement;
+    //   if (slides) {
+    //     slides.style.opacity = '0';
+    //   }
+    // }
+
     this.fadeOut(
       psWrapper[0],
       () => {
         if (this.el && this.el.parentNode) {
-          document.body.removeChild(this.el);
+          document.body?.removeChild?.(this.el);
         }
       },
-      this.options.backdropDuration
+      this.options.backdrop.duration,
+      this.options.backdrop.easing
     );
   }
 

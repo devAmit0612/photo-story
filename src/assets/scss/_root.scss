@@ -1,12 +1,13 @@
 @use 'variables' as *;
 
 :root {
-  --#{$prefix}lightbox-color: #{$lightbox-color};
+  --#{$prefix}color: #{$color};
 
   --#{$prefix}z-index: #{$zIndex};
   --#{$prefix}backdrop-bg: #{$backdrop-bg};
   --#{$prefix}backdrop-blur: #{$backdrop-blur};
 
+  --#{$prefix}toolbar-color: var(--#{$prefix}color);
   --#{$prefix}toolbar-padding-y: #{$toolbar-padding-y};
   --#{$prefix}toolbar-padding-x: #{$toolbar-padding-x};
 

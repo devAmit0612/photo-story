@@ -1,4 +1,6 @@
-import { isBrowser } from '../shared/utils';
+import { getDocument, getWindow } from 'ssr-window';
+
+import { prefix } from '../shared/utils';
 import { type Options, type GalleryItem } from '../types';
 
 export interface DOMContext {
@@ -10,8 +12,15 @@ export interface DOMContext {
     [key: string]: any;
   };
   el: HTMLElement;
+  events: { click: string };
 
   addClass(el: HTMLElement, className: string): void;
+  attachEvents(
+    element: HTMLElement | Window | Document,
+    events: string,
+    handler: EventListenerOrEventListenerObject
+  ): void;
+  createEl(classes?: string, tag?: string): HTMLElement;
   hasClass(el: HTMLElement, className: string): boolean;
   getClassName(name?: string): string;
   getCSSVariable(varName: string): string;
@@ -19,9 +28,27 @@ export interface DOMContext {
 }
 
 export default {
-  createEl(this: DOMContext, classes?: string, tag?: string): HTMLElement {
-    if (!isBrowser) return {} as HTMLElement;
+  createButton(
+    this: DOMContext,
+    html: string,
+    onClick: () => void,
+    ariaLabel?: string,
+    className?: string,
+    tag: string = 'button'
+  ): HTMLElement {
+    const btn = this.createEl(`${prefix}__button`, tag);
+    if (tag === 'button') (btn as HTMLButtonElement).type = 'button';
+    if (className) this.addClass(btn, `${prefix}__button--${className}`);
 
+    if (ariaLabel) btn.setAttribute('aria-label', ariaLabel);
+    if (html) btn.innerHTML = html;
+
+    this.attachEvents(btn, this.events.click, onClick);
+    return btn;
+  },
+
+  createEl(this: DOMContext, classes?: string, tag?: string): HTMLElement {
+    const document = getDocument();
     const el = document.createElement(tag || 'div');
     if (classes) {
       // Use regex split to handle accidental double spaces safely
@@ -36,8 +63,7 @@ export default {
   },
 
   counter(this: DOMContext): void {
-    if (!isBrowser) return;
-
+    const document = getDocument();
     const counterEl = document.getElementById(this.getIdName('ps_current_slide'));
     if (counterEl) {
       counterEl.innerHTML = (this.currentIndex + 1).toString();
@@ -72,8 +98,8 @@ export default {
   },
 
   getCSSVariable(varName: string): string {
-    if (!isBrowser) return '';
-
+    const window = getWindow();
+    const document = getDocument();
     const root = window.getComputedStyle(document.documentElement);
     const property = '--ps-' + varName;
     return root.getPropertyValue(property).trim();

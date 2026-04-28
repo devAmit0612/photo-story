@@ -1,9 +1,13 @@
-import type { FadeCallback } from '../../types';
+import { getWindow } from 'ssr-window';
+
+import type { CallbackFunType } from '../../types';
+import resolveEasing from './easing';
 
 export default function fadeOut(
   el: HTMLElement | null,
-  cb?: FadeCallback,
-  duration: number = 300
+  cb?: CallbackFunType,
+  duration: number = 300,
+  easing: string = 'linear'
 ): boolean | void {
   if (!el) {
     return false;
@@ -12,6 +16,8 @@ export default function fadeOut(
   el.style.opacity = '1';
 
   let startTime: number | null = null;
+  const easingFn = resolveEasing(easing);
+  const window = getWindow();
 
   const fade = (timestamp: number) => {
     if (startTime === null) {
@@ -20,13 +26,14 @@ export default function fadeOut(
 
     // Calculate how many milliseconds have passed
     const elapsed = timestamp - startTime;
-    // Calculate the current opacity based on progress (from 1 down to 0)
-    const currentOpacity = Math.max(1 - elapsed / duration, 0);
+    const progress = Math.min(elapsed / duration, 1);
+    // Calculate the current opacity based on eased progress (from 1 down to 0)
+    const currentOpacity = 1 - easingFn(progress);
 
     el.style.opacity = currentOpacity.toString();
 
     if (elapsed < duration) {
-      requestAnimationFrame(fade);
+      window.requestAnimationFrame(fade);
     } else {
       el.style.opacity = '0';
       el.style.display = 'none';
@@ -38,5 +45,5 @@ export default function fadeOut(
   };
 
   // Start the animation loop
-  requestAnimationFrame(fade);
+  window.requestAnimationFrame(fade);
 }

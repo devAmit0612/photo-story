@@ -40,7 +40,7 @@ export default function extendModuleDefaults(
       options[moduleOptionName].enable = true;
     }
 
-    // 2. Type Assertion: Tell TS the merged result is definitely our Options type
+    // Type Assertion: Tell TS the merged result is definitely our Options type
     ps.options = extend(options, moduleDefaults, obj) as Options & Record<string, any>;
   };
 }

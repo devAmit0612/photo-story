@@ -45,6 +45,9 @@
     "url": "https://github.com/devAmit0612/photo-story/issues"
   },
   "homepage": "https://github.com/devAmit0612/photo-story",
+  "dependencies": {
+    "ssr-window": "^5.0.1"
+  },
   "devDependencies": {
     "prettier": "^3.8.3",
     "sass": "^1.99.0",

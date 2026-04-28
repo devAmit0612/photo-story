@@ -1,4 +1,4 @@
-import { isBrowser } from '../shared/utils';
+import { getDocument } from 'ssr-window';
 import { type Options } from '../types';
 
 export interface FullscreenContext {
@@ -28,9 +28,10 @@ interface FsDocument extends Document {
 
 export default {
   enterFullscreen(this: FullscreenContext): void {
-    if (!isBrowser) return;
-
+    const document = getDocument() as FsDocument;
     const docEl = document.documentElement as FsHTMLElement;
+
+    if (!docEl) return;
 
     // Use standard 'requestFullscreen' first, fallback to vendor prefixes
     const requestFs =
@@ -52,27 +53,25 @@ export default {
   },
 
   exitFullscreen(this: FullscreenContext): void {
-    if (!isBrowser) return;
-
-    const doc = document as FsDocument;
+    const document = getDocument() as FsDocument;
     const isCurrentlyFullscreen = !!(
-      doc.fullscreenElement ||
-      doc.mozFullScreenElement ||
-      doc.webkitFullscreenElement ||
-      doc.msFullscreenElement
+      document.fullscreenElement ||
+      document.mozFullScreenElement ||
+      document.webkitFullscreenElement ||
+      document.msFullscreenElement
     );
 
     if (!isCurrentlyFullscreen) return;
 
     // Use standard 'exitFullscreen' first, fallback to vendor prefixes
     const exitFs =
-      doc.exitFullscreen ||
-      doc.webkitExitFullscreen ||
-      doc.mozCancelFullScreen ||
-      doc.msExitFullscreen;
+      document.exitFullscreen ||
+      document.webkitExitFullscreen ||
+      document.mozCancelFullScreen ||
+      document.msExitFullscreen;
 
     if (exitFs) {
-      exitFs.call(doc).catch((err: Error) => {
+      exitFs.call(document).catch((err: Error) => {
         console.warn(`Error attempting to exit fullscreen: ${err.message}`);
       });
     }
@@ -83,16 +82,14 @@ export default {
   },
 
   fullscreen(this: FullscreenContext): void {
-    if (!isBrowser) return;
-
-    const doc = document as FsDocument;
+    const document = getDocument() as FsDocument;
 
     // Accurately check if any fullscreen element exists across all browsers
     const isCurrentlyFullscreen = !!(
-      doc.fullscreenElement ||
-      doc.mozFullScreenElement ||
-      doc.webkitFullscreenElement ||
-      doc.msFullscreenElement
+      document.fullscreenElement ||
+      document.mozFullScreenElement ||
+      document.webkitFullscreenElement ||
+      document.msFullscreenElement
     );
 
     if (isCurrentlyFullscreen) {
