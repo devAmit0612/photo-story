@@ -42,7 +42,7 @@ const prototypes: Record<string, any> = {
 };
 
 // Define the shape of a PhotoStory Module
-type PhotoStoryModule = (context: {
+export type PhotoStoryModule = (context: {
   ps: PhotoStory;
   moduleDefaults: ReturnType<typeof extendModuleDefaults>;
   on: PhotoStory['on'];

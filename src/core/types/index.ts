@@ -51,15 +51,18 @@ export interface JQueryElement {
 export interface Template {
   download: string;
   close: string;
-  enterFullscreen: string;
-  exitFullscreen: string;
+}
+
+export interface Fullscreen {
+  enterIcon: string;
+  exitIcon: string;
 }
 
 export interface Options {
   gallery: Gallery;
 
   // Lightbox options
-  fullscreen: boolean;
+  fullscreen: boolean | Fullscreen;
   showCounter: boolean;
   download: boolean;
   captions: boolean;
