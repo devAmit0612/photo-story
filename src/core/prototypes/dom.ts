@@ -1,6 +1,6 @@
 import { getDocument, getWindow } from 'ssr-window';
 
-import { prefix } from '../shared/utils';
+import { PREFIX } from '../const';
 import { type Options, type GalleryItem } from '../types';
 
 export interface DOMContext {
@@ -36,9 +36,9 @@ export default {
     className?: string,
     tag: string = 'button'
   ): HTMLElement {
-    const btn = this.createEl(`${prefix}__button`, tag);
+    const btn = this.createEl(`${PREFIX}__button`, tag);
     if (tag === 'button') (btn as HTMLButtonElement).type = 'button';
-    if (className) this.addClass(btn, `${prefix}__button--${className}`);
+    if (className) this.addClass(btn, `${PREFIX}__button--${className}`);
 
     if (ariaLabel) btn.setAttribute('aria-label', ariaLabel);
     if (html) btn.innerHTML = html;

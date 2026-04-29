@@ -1,5 +1,5 @@
-import { prefix } from '../shared/utils';
-import { type Options, type GalleryItem } from '../types';
+import { PREFIX } from '../const';
+import type { Options, GalleryItem } from '../types';
 
 export interface ToolbarContext {
   options: Options;
@@ -31,13 +31,13 @@ export interface ToolbarContext {
 export default {
   toolbar(this: ToolbarContext, gallery: GalleryItem[]): HTMLElement {
     this.tools = {};
-    const toolbar = this.createEl(`${prefix}__toolbar`);
-    const optionsContainer = this.createEl(`${prefix}__toolbar__options`);
+    const toolbar = this.createEl(`${PREFIX}__toolbar`);
+    const optionsContainer = this.createEl(`${PREFIX}__toolbar__options`);
 
     // Gallery image counter (1 / 3)
     if (this.options.showCounter) {
       const html = `<span id="${this.getIdName('current_slide')}">${this.currentIndex + 1}</span><span> / ${gallery.length}</span>`;
-      const counterEl = this.createEl(`${prefix}__counter`);
+      const counterEl = this.createEl(`${PREFIX}__counter`);
       counterEl.innerHTML = html;
 
       this.tools.counter = counterEl;

@@ -13,8 +13,7 @@ const defaultOptions: Options = {
   // Bullets
   bullets: false,
 
-  // Set image loader and amount of preload image
-  loader: true,
+  // Amount of preload image
   preload: 1,
 
   // Effects
@@ -25,10 +24,13 @@ const defaultOptions: Options = {
   // Reveal image
   reveal: {
     effect: 'default',
+    duration: 300,
+    easing: 'ease',
   },
 
   backdrop: {
     duration: 250,
+    easing: 'ease',
   },
 
   // Right to left

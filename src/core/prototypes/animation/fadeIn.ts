@@ -1,7 +1,8 @@
 import { getWindow } from 'ssr-window';
 
-import type { CallbackFunType } from '../../types';
 import resolveEasing from './easing';
+import { prefersReducedMotion } from '../../shared/utils';
+import type { CallbackFunType } from '../../types';
 
 export default function fadeIn(
   el: HTMLElement | null,
@@ -11,6 +12,16 @@ export default function fadeIn(
 ): boolean | void {
   if (!el) {
     return false;
+  }
+
+  if (prefersReducedMotion() || duration <= 0) {
+    el.style.opacity = '1';
+    el.style.display = 'block';
+
+    if (cb) {
+      cb();
+    }
+    return;
   }
 
   el.style.opacity = '0';

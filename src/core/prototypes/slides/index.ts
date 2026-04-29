@@ -1,5 +1,7 @@
-import setSlides from './set-slides';
+import changeSlide from './changeSlide';
+import setSlides from './setSlides';
 
 export default {
+  changeSlide,
   setSlides,
 };

@@ -68,8 +68,7 @@ export interface Options {
   // Bullets
   bullets: boolean;
 
-  // Set image loader and amount of preload image
-  loader: boolean;
+  // Amount of preload image
   preload: number;
 
   // Effects

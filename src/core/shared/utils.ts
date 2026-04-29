@@ -7,9 +7,18 @@ import {
   type GalleryItem,
   type JQueryElement,
   type MediaType,
+  type Options,
 } from '../types';
 
-export const prefix = 'ps';
+export function prefersReducedMotion(): boolean {
+  const window = getWindow();
+
+  if (typeof window.matchMedia !== 'function') {
+    return false;
+  }
+
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
 
 export function checkPassiveListener(): boolean {
   const window = getWindow();
@@ -41,24 +50,32 @@ export function deleteProps(obj: Record<string, unknown>): void {
 }
 
 export function extend<T extends Record<string, any>>(...args: Partial<T>[]): T {
-  let obj = {} as T;
-  const options = Object(args[0]) as Record<string, any>;
-  const defaults = args[args.length - 1] as Record<string, any>;
+  const target = {} as Record<string, any>;
 
-  obj = Object.assign(obj, ...args);
-  for (const key in defaults) {
-    if (key === 'gallery' && isObject(options[key])) {
-      const gallery = {
-        gallery: options[key],
-      };
-      Object.assign(defaults[key], gallery[key]);
-    } else {
-      if (isObject(defaults[key]) && isObject(options[key])) {
-        Object.assign(defaults[key], options[key]);
-      }
+  args.forEach((source) => {
+    if (!isObject(source)) {
+      return;
     }
-  }
-  return obj;
+
+    Object.keys(source).forEach((key) => {
+      const value = source[key];
+
+      if (Array.isArray(value)) {
+        target[key] = value.slice();
+        return;
+      }
+
+      if (isObject(value)) {
+        const base = isObject(target[key]) ? target[key] : {};
+        target[key] = extend(base, value);
+        return;
+      }
+
+      target[key] = value;
+    });
+  });
+
+  return target as T;
 }
 
 export function getCurrentObj(
@@ -169,6 +186,17 @@ export function getGalleryType(obj: Gallery): Gallery {
     }
   }
   return obj;
+}
+
+export function getIndex(options: Options, index: number, total: number): number | null {
+  if (index >= 0 && index < total) {
+    return index; // Normal bounds
+  }
+  if (options.loop) {
+    // Safely wrap around negative and out-of-bound indexes
+    return ((index % total) + total) % total;
+  }
+  return null; // Out of bounds and loop is disabled
 }
 
 // Internal Helper Methods

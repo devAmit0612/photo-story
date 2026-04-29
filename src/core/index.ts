@@ -9,7 +9,6 @@ import {
   getGalleryType,
   isNodeList,
   isObject,
-  prefix,
 } from './shared/utils';
 
 import { type Options, type GalleryItem } from './types';
@@ -17,15 +16,16 @@ import { type Options, type GalleryItem } from './types';
 // Prototypes
 import dom from './prototypes/dom';
 import eventsProto from './prototypes/events';
-import eventEmitter from './prototypes/event-emitter';
+import eventEmitter from './prototypes/eventEmitter';
 import fullscreen from './prototypes/fullscreen';
 import animation from './prototypes/animation';
-import loader from './prototypes/loader';
 import slides from './prototypes/slides';
 import toolbar from './prototypes/toolbar';
+import media from './prototypes/media';
 
-import extendModuleDefaults from './shared/extend-module';
+import extendModuleDefaults from './shared/extendModule';
 import defaults from './defaults';
+import { PREFIX } from './const';
 
 // Group prototypes for the mixin loop
 const prototypes: Record<string, any> = {
@@ -34,9 +34,9 @@ const prototypes: Record<string, any> = {
   eventEmitter,
   fullscreen,
   animation,
-  loader,
   toolbar,
   slides,
+  media,
 };
 
 // Define the shape of a PhotoStory Module
@@ -68,11 +68,8 @@ interface PhotoStory {
   fullscreen(): void;
   fadeIn(el: HTMLElement, cb?: () => void, duration?: number, easing?: string): void;
   fadeOut(el: HTMLElement, cb?: () => void, duration?: number, easing?: string): void;
-  createLoader(): HTMLElement;
-  showLoader(): void;
-  hideLoader(): void;
-  mount(cb?: () => void): void;
   setSlides(gallery: GalleryItem[]): void;
+  changeSlide(newIndex: number, isInitial?: boolean): void;
 }
 
 class PhotoStory {
@@ -86,6 +83,10 @@ class PhotoStory {
   public modules: PhotoStoryModule[];
   public galleryId: string | null = null;
   public el!: HTMLElement;
+  public wrapperEl!: HTMLElement;
+  public slidesEl!: HTMLElement;
+  public backdropEl!: HTMLElement;
+  public currentMediaEl: HTMLElement | null = null;
   public tools: Record<string, HTMLElement | HTMLAnchorElement | HTMLButtonElement | null> = {};
   public events: { click: string };
 
@@ -180,26 +181,23 @@ class PhotoStory {
     const document = getDocument();
     if (!document.body?.appendChild) return;
 
-    const psWrapper = this.createEl();
-    psWrapper.id = `${prefix}_wrapper`;
+    this.wrapperEl = this.createEl();
+    this.wrapperEl.id = `${PREFIX}_wrapper`;
 
     const gallery = this.options.gallery[this.galleryId];
-    const backdrop = this.createEl(`${prefix}__backdrop`);
-    const loaderEl = this.createLoader();
-
-    this.el = this.createEl(`${prefix}`);
-
     const tb = this.toolbar(gallery);
-    psWrapper.append(backdrop, tb);
-    this.el.append(psWrapper, loaderEl);
 
-    // if (typeof this.setSlides === 'function') {
-    //   this.setSlides(gallery);
-    // }
+    this.backdropEl = this.createEl(`${PREFIX}__backdrop`);
+    this.wrapperEl.append(this.backdropEl, tb);
+
+    this.el = this.createEl(`${PREFIX}`);
+    this.el.append(this.wrapperEl);
+
+    if (typeof this.setSlides === 'function') {
+      this.setSlides(gallery);
+    }
 
     document.body.appendChild(this.el);
-    this.showLoader();
-    this.fadeIn(psWrapper, undefined, this.options.backdrop.duration, this.options.backdrop.easing);
   }
 
   init(): boolean | void {
@@ -232,7 +230,7 @@ class PhotoStory {
 
     this.currentIndex = 0;
     this.galleryId = null;
-    const document = getDocument();
+    this.currentMediaEl = null;
 
     // Detach events from tools
     Object.keys(this.tools).forEach((tool) => {
@@ -242,27 +240,6 @@ class PhotoStory {
         this.tools[tool] = null;
       }
     });
-
-    const psWrapper = (getElement(`#${prefix}_wrapper`) || []) as HTMLElement[];
-    if (psWrapper.length === 0) return;
-
-    // if (this.options.reveal.effect === 'default') {
-    //   const slides = document.getElementById(`${prefix}_slides`) as HTMLElement;
-    //   if (slides) {
-    //     slides.style.opacity = '0';
-    //   }
-    // }
-
-    this.fadeOut(
-      psWrapper[0],
-      () => {
-        if (this.el && this.el.parentNode) {
-          document.body?.removeChild?.(this.el);
-        }
-      },
-      this.options.backdrop.duration,
-      this.options.backdrop.easing
-    );
   }
 
   destroy(): void {

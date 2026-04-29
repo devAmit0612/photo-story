@@ -1,0 +1,114 @@
+import { getDocument, getWindow } from 'ssr-window';
+
+import { PREFIX } from '../const';
+import type { GalleryItem, Options } from '../types';
+
+export interface MediaContext {
+  options: Options;
+  currentMediaEl: HTMLElement | null;
+  createEl(classes?: string, tag?: string): HTMLElement;
+  placeholder(imgEl: HTMLImageElement, item: GalleryItem): void;
+}
+
+function escapeHTML(value?: string): string {
+  if (!value) return '';
+
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+export default {
+  media(this: MediaContext, slideEl: HTMLElement, item: GalleryItem, isCurrent: boolean): void {
+    if (isCurrent) {
+      slideEl.setAttribute('aria-hidden', 'false');
+    }
+
+    const mediaViewport = this.createEl(`${PREFIX}__slide__viewport`);
+    slideEl.innerHTML = '';
+
+    if (!item.type || item.type === 'image') {
+      const imgEl = this.createEl(`${PREFIX}__slide__media`, 'img') as HTMLImageElement;
+      imgEl.alt = item.alt || item.title || '';
+      imgEl.decoding = 'async';
+      imgEl.loading = 'eager';
+
+      if (item.width) imgEl.width = Number(item.width);
+      if (item.height) imgEl.height = Number(item.height);
+
+      if (item.thumb && item.thumb !== item.src) {
+        imgEl.src = item.thumb;
+
+        // In-memory loading to prevent blank flashes
+        const document = getDocument();
+        const mainImgEl = document.createElement('img') as HTMLImageElement;
+        mainImgEl.decoding = 'async';
+
+        mainImgEl.onload = () => {
+          imgEl.src = item.src as string;
+          if (item.srcset) imgEl.srcset = item.srcset;
+          imgEl.classList.remove(`${PREFIX}__image--loading`);
+        };
+
+        // Trigger the high-res download
+        mainImgEl.src = item.src as string;
+        if (item.srcset) mainImgEl.srcset = item.srcset;
+      } else {
+        // No thumbnail or they are the same? Just load high-res directly
+        if (item.src) imgEl.src = item.src;
+        if (item.srcset) imgEl.srcset = item.srcset;
+      }
+
+      this.placeholder(imgEl, item);
+      mediaViewport.appendChild(imgEl);
+      slideEl.appendChild(mediaViewport);
+
+      // Store the active media element for the Zoom/Drag modules!
+      if (isCurrent) {
+        this.currentMediaEl = imgEl;
+      }
+    }
+
+    if (this.options.captions) {
+      const captionText = item.captions || item.title || item.alt || '';
+      if (captionText) {
+        const caption = this.createEl(`${PREFIX}__slide__caption`);
+        caption.innerHTML = escapeHTML(captionText);
+        slideEl.appendChild(caption);
+      }
+    }
+  },
+
+  placeholder(imgEl: HTMLImageElement, item: GalleryItem): void {
+    const width = Number(item.width);
+    const height = Number(item.height);
+
+    if (!width || !height) {
+      return;
+    }
+
+    const window = getWindow();
+    const document = getDocument();
+
+    let rootFontSize = 16;
+    if (typeof window.getComputedStyle === 'function' && document.documentElement) {
+      rootFontSize = Number.parseFloat(
+        window.getComputedStyle(document.documentElement).fontSize || '16'
+      );
+    }
+
+    // Fallback values if clientWidth/innerHeight aren't available during SSR
+    const clientWidth = document.documentElement?.clientWidth || 1024;
+    const innerHeight = window.innerHeight || 768;
+
+    const maxWidth = Math.min(Math.max(clientWidth - 32, 0), 72 * rootFontSize);
+    const maxHeight = Math.max(innerHeight - 128, 0);
+    const scale = Math.min(maxWidth / width, maxHeight / height, 1);
+
+    imgEl.style.width = `${width * scale}px`;
+    imgEl.style.height = `${height * scale}px`;
+  },
+};
