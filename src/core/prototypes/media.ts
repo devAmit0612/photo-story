@@ -8,6 +8,12 @@ export interface MediaContext {
   currentMediaEl: HTMLElement | null;
   createEl(classes?: string, tag?: string): HTMLElement;
   placeholder(imgEl: HTMLImageElement, item: GalleryItem): void;
+  lazyLoad(
+    media: HTMLImageElement,
+    fullSrc: string,
+    fullSrcset?: string,
+    callback?: () => void
+  ): void;
 }
 
 function escapeHTML(value?: string): string {
@@ -41,21 +47,7 @@ export default {
 
       if (item.thumb && item.thumb !== item.src) {
         imgEl.src = item.thumb;
-
-        // In-memory loading to prevent blank flashes
-        const document = getDocument();
-        const mainImgEl = document.createElement('img') as HTMLImageElement;
-        mainImgEl.decoding = 'async';
-
-        mainImgEl.onload = () => {
-          imgEl.src = item.src as string;
-          if (item.srcset) imgEl.srcset = item.srcset;
-          imgEl.classList.remove(`${PREFIX}__image--loading`);
-        };
-
-        // Trigger the high-res download
-        mainImgEl.src = item.src as string;
-        if (item.srcset) mainImgEl.srcset = item.srcset;
+        this.lazyLoad(imgEl, item.src, item.srcset);
       } else {
         // No thumbnail or they are the same? Just load high-res directly
         if (item.src) imgEl.src = item.src;
@@ -79,6 +71,52 @@ export default {
         caption.innerHTML = escapeHTML(captionText);
         slideEl.appendChild(caption);
       }
+    }
+  },
+
+  lazyLoad(media: HTMLImageElement, fullSrc: string, fullSrcset?: string, callback?: () => void) {
+    const document = getDocument();
+    const preloadImage = document.createElement('img') as HTMLImageElement;
+    preloadImage.decoding = 'async';
+
+    let finished = false;
+
+    const finish = () => {
+      if (finished) return;
+      finished = true;
+
+      if (media.isConnected) {
+        if (fullSrcset) {
+          media.srcset = fullSrcset;
+        } else {
+          media.removeAttribute('srcset');
+        }
+        media.src = fullSrc;
+      }
+
+      if (callback) callback();
+    };
+
+    const onLoad = () => {
+      if (typeof preloadImage.decode === 'function') {
+        preloadImage
+          .decode()
+          .catch(() => undefined)
+          .finally(finish);
+        return;
+      }
+      finish();
+    };
+
+    preloadImage.addEventListener('load', onLoad, { once: true });
+    preloadImage.addEventListener('error', finish, { once: true });
+
+    if (fullSrcset) preloadImage.srcset = fullSrcset;
+    preloadImage.src = fullSrc;
+
+    // Trigger instantly if already cached
+    if (preloadImage.complete && preloadImage.naturalWidth > 0) {
+      onLoad();
     }
   },
 

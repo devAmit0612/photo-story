@@ -7,6 +7,7 @@
   width: 100%;
   height: 100%;
   z-index: var(--#{$prefix}z-index);
+  overflow: hidden;
 
   .ps__backdrop {
     position: fixed;
@@ -71,7 +72,6 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      overflow: hidden;
     }
 
     .ps__slide__media {

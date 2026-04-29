@@ -22,6 +22,7 @@ import animation from './prototypes/animation';
 import slides from './prototypes/slides';
 import toolbar from './prototypes/toolbar';
 import media from './prototypes/media';
+import effect from './prototypes/effect';
 
 import extendModuleDefaults from './shared/extendModule';
 import defaults from './defaults';
@@ -37,6 +38,7 @@ const prototypes: Record<string, any> = {
   toolbar,
   slides,
   media,
+  effect,
 };
 
 // Define the shape of a PhotoStory Module
@@ -65,6 +67,8 @@ interface PhotoStory {
   emit(event: string, data?: any): this;
   enterFullscreen(): void;
   exitFullscreen(): void;
+  enterEffect(): void;
+  exitEffect(): void;
   fullscreen(): void;
   fadeIn(el: HTMLElement, cb?: () => void, duration?: number, easing?: string): void;
   fadeOut(el: HTMLElement, cb?: () => void, duration?: number, easing?: string): void;
@@ -87,6 +91,7 @@ class PhotoStory {
   public slidesEl!: HTMLElement;
   public backdropEl!: HTMLElement;
   public currentMediaEl: HTMLElement | null = null;
+  public currentThumbEl: HTMLElement | null = null;
   public tools: Record<string, HTMLElement | HTMLAnchorElement | HTMLButtonElement | null> = {};
   public events: { click: string };
 
@@ -168,6 +173,7 @@ class PhotoStory {
         const target = event.currentTarget as HTMLElement;
         const currentObj = getCurrentObj(this.originalGallery, target);
 
+        this.currentThumbEl = target.querySelector('img') as HTMLImageElement;
         this.currentIndex = currentObj.index;
         this.galleryId = currentObj.id || null;
         this.open();
@@ -198,6 +204,7 @@ class PhotoStory {
     }
 
     document.body.appendChild(this.el);
+    this.enterEffect();
   }
 
   init(): boolean | void {
@@ -227,10 +234,10 @@ class PhotoStory {
 
   close(): void {
     this.exitFullscreen();
+    this.exitEffect();
 
     this.currentIndex = 0;
     this.galleryId = null;
-    this.currentMediaEl = null;
 
     // Detach events from tools
     Object.keys(this.tools).forEach((tool) => {

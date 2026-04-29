@@ -17,15 +17,18 @@ const defaultOptions: Options = {
   preload: 1,
 
   // Effects
-  effect: {
-    name: 'default',
-  },
-
-  // Reveal image
-  reveal: {
-    effect: 'default',
+  enterEffect: {
+    name: 'scale',
     duration: 300,
     easing: 'ease',
+  },
+  exitEffect: {
+    name: 'scale',
+    duration: 300,
+    easing: 'ease',
+  },
+  transitionEffect: {
+    name: 'default',
   },
 
   backdrop: {

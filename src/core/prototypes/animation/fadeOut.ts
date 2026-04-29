@@ -6,9 +6,9 @@ import type { CallbackFunType } from '../../types';
 
 export default function fadeOut(
   el: HTMLElement | null,
-  cb?: CallbackFunType,
   duration: number = 300,
-  easing: string = 'linear'
+  easing: string = 'linear',
+  cb?: CallbackFunType
 ): boolean | void {
   if (!el) {
     return false;

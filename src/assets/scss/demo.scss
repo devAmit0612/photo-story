@@ -438,3 +438,9 @@ h6,
   @extend %heading;
   font-size: var(--h6-font-size);
 }
+
+.gallery {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}

@@ -1,7 +1,7 @@
 export const mediaNames = ['image', 'video', 'youtube', 'vimeo', 'dailymotion'] as const;
 
-export type RevealTypes = 'default' | 'fade' | 'scale';
-export type EffectTypes = RevealTypes | 'slide';
+export type EffectTypes = 'default' | 'fade' | 'scale';
+export type TransitionEffectTypes = EffectTypes | 'slide';
 
 export type MediaType = (typeof mediaNames)[number];
 
@@ -20,8 +20,8 @@ export interface Effect {
   easing?: string;
 }
 
-export interface Reveal {
-  effect: RevealTypes;
+export interface Transition extends Omit<Effect, 'name'> {
+  name: TransitionEffectTypes;
   duration?: number;
   easing?: string;
 }
@@ -72,8 +72,10 @@ export interface Options {
   preload: number;
 
   // Effects
-  effect: Effect;
-  reveal: Reveal;
+  enterEffect: Effect;
+  exitEffect: Effect;
+  transitionEffect: Transition;
+
   backdrop: Backdrop;
 
   // Right to left
