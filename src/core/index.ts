@@ -17,12 +17,14 @@ import { type Options, type GalleryItem } from './types';
 import dom from './prototypes/dom';
 import eventsProto from './prototypes/events';
 import eventEmitter from './prototypes/eventEmitter';
-import fullscreen from './prototypes/fullscreen';
 import animation from './prototypes/animation';
 import slides from './prototypes/slides';
 import toolbar from './prototypes/toolbar';
 import media from './prototypes/media';
 import effect from './prototypes/effect';
+
+// Modules
+import Modules from './modules/index';
 
 import extendModuleDefaults from './shared/extendModule';
 import defaults from './defaults';
@@ -33,7 +35,6 @@ const prototypes: Record<string, any> = {
   dom,
   events: eventsProto,
   eventEmitter,
-  fullscreen,
   animation,
   toolbar,
   slides,
@@ -51,7 +52,31 @@ export type PhotoStoryModule = (context: {
 }) => void;
 
 interface PhotoStory {
+  options: Options;
+  element: HTMLElement[];
+  currentIndex: number;
+  originalGallery: Map<string, HTMLElement[]>;
+  eventsListeners: Record<string, Function[]>;
+  modules: PhotoStoryModule[];
+  galleryId: string | null;
+  el: HTMLElement;
+  wrapperEl: HTMLElement;
+  slidesEl: HTMLElement;
+  backdropEl: HTMLElement;
+  toolbarEl: HTMLElement;
+  currentMediaEl: HTMLElement | null;
+  currentThumbEl: HTMLElement | null;
+  tools: Record<string, HTMLElement | HTMLAnchorElement | HTMLButtonElement | null>;
+  events: { click: string };
+
   createEl(classes?: string, tag?: string): HTMLElement;
+  createButton(
+    html: string,
+    onClick: () => void,
+    ariaLabel?: string,
+    className?: string,
+    tag?: string
+  ): HTMLElement;
   toolbar(gallery: GalleryItem[]): HTMLElement;
   downloadURL(): void;
   getIdName(name: string): string;
@@ -65,11 +90,8 @@ interface PhotoStory {
   on(events: string, handler: Function): this;
   off(events: string, handler?: Function): this;
   emit(event: string, data?: any): this;
-  enterFullscreen(): void;
-  exitFullscreen(): void;
   enterEffect(): void;
   exitEffect(): void;
-  fullscreen(): void;
   fadeIn(el: HTMLElement, cb?: () => void, duration?: number, easing?: string): void;
   fadeOut(el: HTMLElement, cb?: () => void, duration?: number, easing?: string): void;
   setSlides(gallery: GalleryItem[]): void;
@@ -78,22 +100,6 @@ interface PhotoStory {
 
 class PhotoStory {
   static __modules: PhotoStoryModule[] = [];
-
-  public options: Options;
-  public element: HTMLElement[];
-  public currentIndex: number = 0;
-  public originalGallery: Map<string, HTMLElement[]> = new Map();
-  public eventsListeners: Record<string, Function[]> = {};
-  public modules: PhotoStoryModule[];
-  public galleryId: string | null = null;
-  public el!: HTMLElement;
-  public wrapperEl!: HTMLElement;
-  public slidesEl!: HTMLElement;
-  public backdropEl!: HTMLElement;
-  public currentMediaEl: HTMLElement | null = null;
-  public currentThumbEl: HTMLElement | null = null;
-  public tools: Record<string, HTMLElement | HTMLAnchorElement | HTMLButtonElement | null> = {};
-  public events: { click: string };
 
   // Constructor Overloads to allow (options, element) or (element, options)
   constructor(element: string | HTMLElement | NodeListOf<HTMLElement>, options?: Partial<Options>);
@@ -133,7 +139,7 @@ class PhotoStory {
     this.modules.forEach((moduleInit) => {
       moduleInit({
         ps,
-        moduleDefaults: extendModuleDefaults(this.options, defaults, ps),
+        moduleDefaults: extendModuleDefaults(defaults, ps),
         on: ps.on.bind(ps),
         off: ps.off.bind(ps),
         emit: ps.emit.bind(ps),
@@ -191,10 +197,10 @@ class PhotoStory {
     this.wrapperEl.id = `${PREFIX}_wrapper`;
 
     const gallery = this.options.gallery[this.galleryId];
-    const tb = this.toolbar(gallery);
+    this.toolbarEl = this.toolbar(gallery);
 
     this.backdropEl = this.createEl(`${PREFIX}__backdrop`);
-    this.wrapperEl.append(this.backdropEl, tb);
+    this.wrapperEl.append(this.backdropEl, this.toolbarEl);
 
     this.el = this.createEl(`${PREFIX}`);
     this.el.append(this.wrapperEl);
@@ -233,7 +239,7 @@ class PhotoStory {
   }
 
   close(): void {
-    this.exitFullscreen();
+    this.emit('close');
     this.exitEffect();
 
     this.currentIndex = 0;
@@ -280,5 +286,8 @@ Object.keys(prototypes).forEach((prototypeGroup) => {
     (PhotoStory.prototype as any)[protoMethod] = prototypes[prototypeGroup][protoMethod];
   });
 });
+
+// Install modules
+PhotoStory.module(Modules.Modules);
 
 export default PhotoStory;

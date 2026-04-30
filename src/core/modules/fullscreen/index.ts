@@ -1,7 +1,8 @@
 import { getDocument } from 'ssr-window';
-import { type Options } from '../../types';
-import type { PhotoStoryModule } from '../..';
+
 import { PREFIX } from '../../const';
+import type { PhotoStoryModule } from '../..';
+import type { FullscreenOptions } from '../../types';
 
 interface FsHTMLElement extends HTMLElement {
   mozRequestFullScreen?: () => Promise<void>;
@@ -18,28 +19,69 @@ interface FsDocument extends Document {
   webkitExitFullscreen?: () => Promise<void>;
 }
 
-const Fullscreen: PhotoStoryModule = ({ ps, moduleDefaults, on, emit }) => {
-  void ps;
-  void moduleDefaults;
-  void on;
-  void emit;
-
+const Fullscreen: PhotoStoryModule = ({ ps, moduleDefaults, on }) => {
   moduleDefaults({
     fullscreen: {
+      enabled: true,
       enterIcon: `<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 256 256"><path d="M216,48V88a8,8,0,0,1-16,0V56H168a8,8,0,0,1,0-16h40A8,8,0,0,1,216,48ZM88,200H56V168a8,8,0,0,0-16,0v40a8,8,0,0,0,8,8H88a8,8,0,0,0,0-16Zm120-40a8,8,0,0,0-8,8v32H168a8,8,0,0,0,0,16h40a8,8,0,0,0,8-8V168A8,8,0,0,0,208,160ZM88,40H48a8,8,0,0,0-8,8V88a8,8,0,0,0,16,0V56H88a8,8,0,0,0,0-16Z"></path></svg>`,
       exitIcon: `<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 256 256"><path d="M152,96V48a8,8,0,0,1,16,0V88h40a8,8,0,0,1,0,16H160A8,8,0,0,1,152,96ZM96,152H48a8,8,0,0,0,0,16H88v40a8,8,0,0,0,16,0V160A8,8,0,0,0,96,152Zm112,0H160a8,8,0,0,0-8,8v48a8,8,0,0,0,16,0V168h40a8,8,0,0,0,0-16ZM96,40a8,8,0,0,0-8,8V88H48a8,8,0,0,0,0,16H96a8,8,0,0,0,8-8V48A8,8,0,0,0,96,40Z"></path></svg>`,
     },
   });
 
-  function init() {}
+  function isFullscreen(): boolean {
+    const document = getDocument() as FsDocument;
+    return !!(
+      document.fullscreenElement ||
+      document.mozFullScreenElement ||
+      document.webkitFullscreenElement ||
+      document.msFullscreenElement
+    );
+  }
 
-  function enterFullscreen(): void {
+  // Centralized UI updater that reacts to the browser's actual state
+  function updateIcon() {
+    if (!ps.tools?.fullscreen || typeof ps.options.fullscreen === 'boolean') return;
+
+    const fsOptions = ps.options.fullscreen as FullscreenOptions;
+    ps.tools.fullscreen.innerHTML = isFullscreen()
+      ? (fsOptions.exitIcon as string)
+      : (fsOptions.enterIcon as string);
+  }
+
+  function init() {
+    const fsOptions = ps.options.fullscreen as FullscreenOptions;
+
+    // Create fullscreen button
+    const fsBtn = ps.createButton(
+      fsOptions.enterIcon as string,
+      () => toggle(),
+      'Toggle Fullscreen'
+    ) as HTMLButtonElement;
+
+    ps.tools.fullscreen = fsBtn;
+    const optionsContainer = ps.toolbarEl?.querySelector(
+      `.${PREFIX}__toolbar__options`
+    ) as HTMLElement;
+
+    if (optionsContainer) {
+      optionsContainer.prepend(fsBtn);
+    }
+
+    // Listen to browser-level fullscreen changes (handles 'Esc' key)
+    const document = getDocument();
+    ps.attachEvents(
+      document,
+      'fullscreenchange webkitfullscreenchange mozfullscreenchange MSFullscreenChange',
+      updateIcon
+    );
+  }
+
+  function enter(): void {
     const document = getDocument() as FsDocument;
     const docEl = document.documentElement as FsHTMLElement;
 
     if (!docEl) return;
 
-    // Use standard 'requestFullscreen' first, fallback to vendor prefixes
     const requestFs =
       docEl.requestFullscreen ||
       docEl.webkitRequestFullscreen ||
@@ -47,29 +89,17 @@ const Fullscreen: PhotoStoryModule = ({ ps, moduleDefaults, on, emit }) => {
       docEl.msRequestFullscreen;
 
     if (requestFs) {
-      // Modern fullscreen APIs return a Promise, catching it prevents unhandled rejections
       requestFs.call(docEl).catch((err: Error) => {
-        console.warn(`Error attempting to enable fullscreen: ${err.message}`);
+        console.warn(`PhotoStory: Error attempting to enable fullscreen: ${err.message}`);
       });
     }
-
-    // if (ps.tools?.fullscreen && ps.options?.fullscreen?.exitFullscreen) {
-    //   ps.tools.fullscreen.innerHTML = this.options.template.exitFullscreen;
-    // }
   }
 
-  function exitFullscreen(): void {
+  function exit(): void {
     const document = getDocument() as FsDocument;
-    const isCurrentlyFullscreen = !!(
-      document.fullscreenElement ||
-      document.mozFullScreenElement ||
-      document.webkitFullscreenElement ||
-      document.msFullscreenElement
-    );
 
-    if (!isCurrentlyFullscreen) return;
+    if (!isFullscreen()) return;
 
-    // Use standard 'exitFullscreen' first, fallback to vendor prefixes
     const exitFs =
       document.exitFullscreen ||
       document.webkitExitFullscreen ||
@@ -78,32 +108,44 @@ const Fullscreen: PhotoStoryModule = ({ ps, moduleDefaults, on, emit }) => {
 
     if (exitFs) {
       exitFs.call(document).catch((err: Error) => {
-        console.warn(`Error attempting to exit fullscreen: ${err.message}`);
+        console.warn(`PhotoStory: Error attempting to exit fullscreen: ${err.message}`);
       });
     }
-
-    // if (ps.tools?.fullscreen && this.options?.template?.enterFullscreen) {
-    //   ps.tools.fullscreen.innerHTML = this.options.template.enterFullscreen;
-    // }
   }
 
-  function fullscreen(): void {
-    const document = getDocument() as FsDocument;
-
-    // Accurately check if any fullscreen element exists across all browsers
-    const isCurrentlyFullscreen = !!(
-      document.fullscreenElement ||
-      document.mozFullScreenElement ||
-      document.webkitFullscreenElement ||
-      document.msFullscreenElement
-    );
-
-    if (isCurrentlyFullscreen) {
-      ps.exitFullscreen();
+  function toggle(): void {
+    if (isFullscreen()) {
+      exit();
     } else {
-      ps.enterFullscreen();
+      enter();
     }
   }
+
+  // Life cycle hooks
+  on('init', () => {
+    const enabled =
+      (typeof ps.options.fullscreen === 'object' && ps.options.fullscreen.enabled) ||
+      ps.options.fullscreen;
+
+    if (!enabled) return;
+    init();
+  });
+
+  on('close', () => {
+    const enabled =
+      (typeof ps.options.fullscreen === 'object' && ps.options.fullscreen.enabled) ||
+      ps.options.fullscreen;
+
+    if (!enabled) return;
+    exit();
+
+    // Prevent memory leaks by removing the event listeners when lightbox closes
+    const document = getDocument();
+    ps.detachEvents(
+      document,
+      'fullscreenchange webkitfullscreenchange mozfullscreenchange MSFullscreenChange'
+    );
+  });
 };
 
 export default Fullscreen;

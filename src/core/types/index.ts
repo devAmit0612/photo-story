@@ -1,26 +1,26 @@
-export const mediaNames = ['image', 'video', 'youtube', 'vimeo', 'dailymotion'] as const;
+import type { MEDIA } from '../const';
 
 export type EffectTypes = 'default' | 'fade' | 'scale';
 export type TransitionEffectTypes = EffectTypes | 'slide';
 
-export type MediaType = (typeof mediaNames)[number];
+export type MediaType = (typeof MEDIA)[number];
 
 export type CallbackFunType = () => void;
 
 export type Gallery = Record<string, GalleryItem[]>;
 
-export interface Backdrop {
+export interface BackdropOptions {
   duration?: number;
   easing?: string;
 }
 
-export interface Effect {
+export interface EffectOptions {
   name: EffectTypes;
   duration?: number;
   easing?: string;
 }
 
-export interface Transition extends Omit<Effect, 'name'> {
+export interface TransitionOptions extends Omit<EffectOptions, 'name'> {
   name: TransitionEffectTypes;
   duration?: number;
   easing?: string;
@@ -38,31 +38,22 @@ export interface GalleryItem {
   type?: MediaType;
 }
 
-export interface CurrentObject {
-  index: number;
-  id?: string;
+export interface TemplateOptions {
+  download?: string;
+  close?: string;
 }
 
-export interface JQueryElement {
-  jquery: string;
-  [index: number]: HTMLElement;
-}
-
-export interface Template {
-  download: string;
-  close: string;
-}
-
-export interface Fullscreen {
-  enterIcon: string;
-  exitIcon: string;
+export interface FullscreenOptions {
+  enabled?: boolean;
+  enterIcon?: string;
+  exitIcon?: string;
 }
 
 export interface Options {
   gallery: Gallery;
 
   // Lightbox options
-  fullscreen: boolean | Fullscreen;
+  fullscreen: boolean | FullscreenOptions;
   showCounter: boolean;
   download: boolean;
   captions: boolean;
@@ -75,14 +66,14 @@ export interface Options {
   preload: number;
 
   // Effects
-  enterEffect: Effect;
-  exitEffect: Effect;
-  transitionEffect: Transition;
+  enterEffect: EffectOptions;
+  exitEffect: EffectOptions;
+  transitionEffect: TransitionOptions;
 
-  backdrop: Backdrop;
+  backdrop: BackdropOptions;
 
   // Right to left
   rtl: boolean;
 
-  template: Template;
+  template: TemplateOptions;
 }

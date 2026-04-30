@@ -7,40 +7,34 @@ export interface PhotoStoryInstance {
 }
 
 export default function extendModuleDefaults(
-  options: Options & Record<string, any>,
   moduleDefaults: Record<string, any>,
   ps: PhotoStoryInstance
 ) {
-  return function extendOptions(obj: Record<string, any> = {}): boolean | void {
-    const moduleOptionName = Object.keys(obj)[0];
+  return function extendOptions(defaults: Record<string, any> = {}): boolean | void {
+    const moduleName = Object.keys(defaults)[0];
 
-    if (!moduleOptionName) return false;
+    if (!moduleName) return false;
 
-    const moduleOptions = obj[moduleOptionName];
-
-    if (
-      typeof moduleOptions !== 'object' ||
-      moduleOptions === null ||
-      Array.isArray(moduleOptions)
-    ) {
+    // Get the Module's hardcoded payload
+    const builtinDef = defaults[moduleName];
+    if (typeof builtinDef !== 'object' || builtinDef === null || Array.isArray(builtinDef)) {
       return false;
     }
 
-    if (options[moduleOptionName] === true) {
-      options[moduleOptionName] = { enable: true };
-    } else if (options[moduleOptionName] === false) {
-      options[moduleOptionName] = { enable: false };
-    }
+    // Normalize the Core Global Defaults (in case it is just a boolean `true`)
+    let coreDef = moduleDefaults[moduleName];
+    if (coreDef === true) coreDef = { enabled: true };
+    else if (coreDef === false) coreDef = { enabled: false };
+    else if (typeof coreDef !== 'object' || coreDef === null) coreDef = {};
 
-    if (
-      typeof options[moduleOptionName] === 'object' &&
-      options[moduleOptionName] !== null &&
-      !('enable' in options[moduleOptionName])
-    ) {
-      options[moduleOptionName].enable = true;
-    }
+    // Normalize the User's config (in case they passed `{ fullscreen: true }`)
+    let userDef = ps.options[moduleName];
+    if (userDef === true) userDef = { enabled: true };
+    else if (userDef === false) userDef = { enabled: false };
+    else if (typeof userDef !== 'object' || userDef === null) userDef = {};
 
-    // Type Assertion: Tell TS the merged result is definitely our Options type
-    ps.options = extend(options, moduleDefaults, obj) as Options & Record<string, any>;
+    // Safely deep merge ONLY this specific module's configuration
+    // The primitive booleans are gone, so the objects will deep-merge perfectly!
+    ps.options[moduleName] = extend({}, builtinDef, coreDef, userDef);
   };
 }

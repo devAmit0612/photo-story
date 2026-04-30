@@ -1,14 +1,17 @@
 import { getDocument, getWindow } from 'ssr-window';
 
-import {
-  mediaNames,
-  type CurrentObject,
-  type Gallery,
-  type GalleryItem,
-  type JQueryElement,
-  type MediaType,
-  type Options,
-} from '../types';
+import { MEDIA } from '../const';
+import type { Gallery, GalleryItem, MediaType, Options } from '../types';
+
+type CurrentObjectTypes = {
+  index: number;
+  id?: string;
+};
+
+type JQueryElementTypes = {
+  jquery: string;
+  [index: number]: HTMLElement;
+};
 
 export function prefersReducedMotion(): boolean {
   const window = getWindow();
@@ -81,8 +84,8 @@ export function extend<T extends Record<string, any>>(...args: Partial<T>[]): T 
 export function getCurrentObj(
   list: Map<string, HTMLElement[]> | null | undefined,
   el: HTMLElement
-): CurrentObject {
-  const currentObj: CurrentObject = { index: 0 };
+): CurrentObjectTypes {
+  const currentObj: CurrentObjectTypes = { index: 0 };
 
   if (list && list.size > 0) {
     Array.from(list.entries()).forEach(([key, values]) => {
@@ -110,20 +113,22 @@ export function getFileType(value: string | null): MediaType | undefined {
   const imgReg = /\.(gif|jpe?g|tiff?|png|webp|bmp)$/i;
   const videoReg = /\.(mp4|mkv|wmv|m4v|mov|avi|flv|webm|flac|mka|m4a|aac|ogg)$/i;
 
-  if (imgReg.test(value)) return mediaNames[0]; // image
-  if (videoReg.test(value)) return mediaNames[1]; // video
-  if (value.includes('youtu')) return mediaNames[2]; // youtube
-  if (value.includes('vimeo')) return mediaNames[3]; // vimeo
-  if (value.includes('dailymotion')) return mediaNames[4]; // dailymotion
+  if (imgReg.test(value)) return MEDIA[0]; // image
+  if (videoReg.test(value)) return MEDIA[1]; // video
+  if (value.includes('youtu')) return MEDIA[2]; // youtube
+  if (value.includes('vimeo')) return MEDIA[3]; // vimeo
+  if (value.includes('dailymotion')) return MEDIA[4]; // dailymotion
 
   return undefined;
 }
 
 export function getElement(
-  obj: string | HTMLElement | JQueryElement | unknown
+  obj: string | HTMLElement | JQueryElementTypes | unknown
 ): HTMLElement | NodeListOf<HTMLElement> | null {
   if (isElement(obj)) {
-    return (obj as JQueryElement).jquery ? (obj as JQueryElement)[0] : (obj as HTMLElement);
+    return (obj as JQueryElementTypes).jquery
+      ? (obj as JQueryElementTypes)[0]
+      : (obj as HTMLElement);
   }
   if (typeof obj === 'string' && obj.trim().length > 0) {
     const document = getDocument();
@@ -245,11 +250,11 @@ function groupBy<T, K>(list: T[], keyGetter: (item: T) => K): Map<K, T[]> {
   return map;
 }
 
-export function isElement(obj: unknown): obj is HTMLElement | JQueryElement {
+export function isElement(obj: unknown): obj is HTMLElement | JQueryElementTypes {
   if (!obj || typeof obj !== 'object') {
     return false;
   }
-  if (typeof (obj as JQueryElement).jquery !== 'undefined') {
+  if (typeof (obj as JQueryElementTypes).jquery !== 'undefined') {
     return true;
   }
   return typeof (obj as HTMLElement).nodeType !== 'undefined';

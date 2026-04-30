@@ -44,20 +44,6 @@ export default {
       toolbar.appendChild(counterEl);
     }
 
-    // Fullscreen Button
-    if (this.options.fullscreen && this.options.template.enterFullscreen) {
-      const fsBtn = this.createButton(
-        this.options.template.enterFullscreen,
-        () => {
-          this.fullscreen();
-        },
-        'Toggle Fullscreen'
-      ) as HTMLButtonElement;
-
-      this.tools.fullscreen = fsBtn;
-      optionsContainer.appendChild(fsBtn);
-    }
-
     // Download Button
     if (this.options.download && this.options.template.download) {
       // Anchor tags need slightly different handling than buttons
