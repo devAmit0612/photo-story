@@ -113,20 +113,8 @@
       color: var(--#{$prefix}button-color);
     }
 
-    &#{&}--next,
-    &#{&}--prev {
-      position: absolute;
-      display: inline-flex;
-      top: 50%;
-      transform: translateY(-50%);
-    }
-
-    &#{&}--next {
-      left: var(--#{$prefix}nav-button-space);
-    }
-
-    &#{&}--prev {
-      right: var(--#{$prefix}nav-button-space);
+    &:disabled {
+      opacity: 0.3;
     }
   }
 }

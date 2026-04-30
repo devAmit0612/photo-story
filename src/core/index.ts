@@ -11,7 +11,7 @@ import {
   isObject,
 } from './shared/utils';
 
-import { type Options, type GalleryItem } from './types';
+import type { Options, GalleryItem } from './types';
 
 // Prototypes
 import dom from './prototypes/dom';
@@ -21,6 +21,7 @@ import animation from './prototypes/animation';
 import slides from './prototypes/slides';
 import toolbar from './prototypes/toolbar';
 import media from './prototypes/media';
+import lazyLoad from './prototypes/lazyLoad';
 import effect from './prototypes/effect';
 
 // Modules
@@ -39,6 +40,7 @@ const prototypes: Record<string, any> = {
   toolbar,
   slides,
   media,
+  lazyLoad,
   effect,
 };
 
@@ -68,6 +70,8 @@ interface PhotoStory {
   currentThumbEl: HTMLElement | null;
   tools: Record<string, HTMLElement | HTMLAnchorElement | HTMLButtonElement | null>;
   events: { click: string };
+  isAtStart: boolean;
+  isAtEnd: boolean;
 
   createEl(classes?: string, tag?: string): HTMLElement;
   createButton(
@@ -79,6 +83,7 @@ interface PhotoStory {
   ): HTMLElement;
   toolbar(gallery: GalleryItem[]): HTMLElement;
   downloadURL(): void;
+  addClass(el: HTMLElement, className: string): void;
   getIdName(name: string): string;
   getChildByClassName(name: string): HTMLElement[];
   attachEvents(

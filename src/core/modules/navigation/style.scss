@@ -1,0 +1,49 @@
+@use '../../../assets/scss/variables' as *;
+
+.ps {
+  .ps__button {
+    color: var(--#{$prefix}nav-button-color, var(--#{$prefix}button-color));
+    background-color: var(--#{$prefix}nav-button-bg, var(--#{$prefix}button-bg));
+    border: var(--#{$prefix}nav-button-border, var(--#{$prefix}button-border));
+    border-radius: var(--#{$prefix}nav-button-border-radius, var(--#{$prefix}button-border-radius));
+    padding: var(--#{$prefix}nav-button-padding, var(--#{$prefix}button-padding));
+
+    &.ps__button--next,
+    &.ps__button--prev {
+      position: absolute;
+      display: inline-flex;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 1;
+      > * {
+        width: var(--#{$prefix}nav-button-icon-size, var(--#{$prefix}button-icon-size));
+        height: var(--#{$prefix}nav-button-icon-size, var(--#{$prefix}button-icon-size));
+      }
+    }
+
+    &.ps__button--next {
+      right: var(--#{$prefix}nav-button-space);
+    }
+
+    &.ps__button--prev {
+      left: var(--#{$prefix}nav-button-space);
+    }
+  }
+}
+
+// RTL
+.ps.ps--rtl,
+[dir='rtl'] {
+  .ps__button {
+    &.ps__button--next {
+      right: auto;
+      left: var(--#{$prefix}nav-button-space);
+      transform: translateY(-50%) scaleX(-1);
+    }
+    &.ps__button--prev {
+      left: auto;
+      right: var(--#{$prefix}nav-button-space);
+      transform: translateY(-50%) scaleX(-1);
+    }
+  }
+}

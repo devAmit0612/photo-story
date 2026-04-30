@@ -36,6 +36,7 @@ export interface GalleryItem {
   title?: string;
   captions?: string;
   type?: MediaType;
+  targetEl?: HTMLImageElement;
 }
 
 export interface TemplateOptions {
@@ -49,31 +50,40 @@ export interface FullscreenOptions {
   exitIcon?: string;
 }
 
+export interface NavigationOptions {
+  enabled?: boolean;
+  nextIcon?: string;
+  prevIcon?: string;
+}
+
 export interface Options {
   gallery: Gallery;
 
   // Lightbox options
-  fullscreen: boolean | FullscreenOptions;
-  showCounter: boolean;
-  download: boolean;
-  captions: boolean;
-  loop: boolean;
+  showCounter?: boolean;
+  download?: boolean;
+  captions?: boolean;
+  loop?: boolean;
 
   // Bullets
-  bullets: boolean;
+  bullets?: boolean;
 
   // Amount of preload image
-  preload: number;
+  preload?: number;
+
+  // Modules
+  fullscreen?: boolean | FullscreenOptions;
+  navigation?: boolean | NavigationOptions;
 
   // Effects
-  enterEffect: EffectOptions;
-  exitEffect: EffectOptions;
-  transitionEffect: TransitionOptions;
+  enterEffect?: EffectOptions;
+  exitEffect?: EffectOptions;
+  transitionEffect?: TransitionOptions;
 
-  backdrop: BackdropOptions;
+  backdrop?: BackdropOptions;
 
   // Right to left
-  rtl: boolean;
+  rtl?: boolean;
 
-  template: TemplateOptions;
+  template?: TemplateOptions;
 }

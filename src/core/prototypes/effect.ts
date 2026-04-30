@@ -33,8 +33,12 @@ export interface EffectContext {
 export default {
   enterEffect(this: EffectContext): void {
     const window = getWindow();
-    const effect = this.options.enterEffect;
+    const effect = this.options.enterEffect || { name: 'default' };
     const currentMedia = this.options.gallery[this.galleryId!][this.currentIndex];
+    const isFade =
+      effect.name === 'fade' ||
+      (effect.name === 'scale' &&
+        (currentMedia.type !== 'image' || !this.currentMediaEl || !this.currentThumbEl));
 
     this.wrapperEl.style.opacity = '0';
     this.slidesEl.style.opacity = '0';
@@ -45,7 +49,7 @@ export default {
       return;
     }
 
-    if (effect.name === 'fade' || (effect.name === 'scale' && currentMedia.type !== 'image')) {
+    if (isFade) {
       this.fadeIn(this.wrapperEl, effect.duration, effect.easing);
       window.setTimeout(() => {
         this.fadeIn(this.slidesEl, effect.duration, effect.easing);
@@ -71,8 +75,12 @@ export default {
   exitEffect(this: EffectContext): void {
     const document = getDocument();
     const window = getWindow();
-    const effect = this.options.exitEffect;
+    const effect = this.options.exitEffect || { name: 'default' };
     const currentMedia = this.options.gallery[this.galleryId!][this.currentIndex];
+    const isFade =
+      effect.name === 'fade' ||
+      (effect.name === 'scale' &&
+        (currentMedia.type !== 'image' || !this.currentMediaEl || !this.currentThumbEl));
 
     if (effect.name === 'default') {
       this.wrapperEl.style.opacity = '0';
@@ -82,7 +90,7 @@ export default {
       return;
     }
 
-    if (effect.name === 'fade' || (effect.name === 'scale' && currentMedia.type !== 'image')) {
+    if (isFade) {
       this.fadeOut(this.wrapperEl, effect.duration, effect.easing);
       this.fadeOut(this.slidesEl, effect.duration, effect.easing, () => {
         document.body.removeChild(this.el);

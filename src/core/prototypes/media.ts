@@ -1,6 +1,6 @@
 import { getDocument, getWindow } from 'ssr-window';
 
-import { PREFIX } from '../const';
+import { PREFIX, PRELOADED_CACHE_IMAGES } from '../const';
 import type { GalleryItem, Options } from '../types';
 
 export interface MediaContext {
@@ -52,6 +52,9 @@ export default {
         // No thumbnail or they are the same? Just load high-res directly
         if (item.src) imgEl.src = item.src;
         if (item.srcset) imgEl.srcset = item.srcset;
+        if (item.src && !PRELOADED_CACHE_IMAGES.has(item.src)) {
+          PRELOADED_CACHE_IMAGES.set(item.src, imgEl);
+        }
       }
 
       this.placeholder(imgEl, item);
@@ -71,52 +74,6 @@ export default {
         caption.innerHTML = escapeHTML(captionText);
         slideEl.appendChild(caption);
       }
-    }
-  },
-
-  lazyLoad(media: HTMLImageElement, fullSrc: string, fullSrcset?: string, callback?: () => void) {
-    const document = getDocument();
-    const preloadImage = document.createElement('img') as HTMLImageElement;
-    preloadImage.decoding = 'async';
-
-    let finished = false;
-
-    const finish = () => {
-      if (finished) return;
-      finished = true;
-
-      if (media.isConnected) {
-        if (fullSrcset) {
-          media.srcset = fullSrcset;
-        } else {
-          media.removeAttribute('srcset');
-        }
-        media.src = fullSrc;
-      }
-
-      if (callback) callback();
-    };
-
-    const onLoad = () => {
-      if (typeof preloadImage.decode === 'function') {
-        preloadImage
-          .decode()
-          .catch(() => undefined)
-          .finally(finish);
-        return;
-      }
-      finish();
-    };
-
-    preloadImage.addEventListener('load', onLoad, { once: true });
-    preloadImage.addEventListener('error', finish, { once: true });
-
-    if (fullSrcset) preloadImage.srcset = fullSrcset;
-    preloadImage.src = fullSrc;
-
-    // Trigger instantly if already cached
-    if (preloadImage.complete && preloadImage.naturalWidth > 0) {
-      onLoad();
     }
   },
 

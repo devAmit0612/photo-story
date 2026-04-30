@@ -123,20 +123,14 @@ const Fullscreen: PhotoStoryModule = ({ ps, moduleDefaults, on }) => {
 
   // Life cycle hooks
   on('init', () => {
-    const enabled =
-      (typeof ps.options.fullscreen === 'object' && ps.options.fullscreen.enabled) ||
-      ps.options.fullscreen;
-
-    if (!enabled) return;
+    const fsOptions = ps.options.fullscreen as FullscreenOptions;
+    if (!fsOptions?.enabled) return;
     init();
   });
 
   on('close', () => {
-    const enabled =
-      (typeof ps.options.fullscreen === 'object' && ps.options.fullscreen.enabled) ||
-      ps.options.fullscreen;
-
-    if (!enabled) return;
+    const fsOptions = ps.options.fullscreen as FullscreenOptions;
+    if (!fsOptions?.enabled) return;
     exit();
 
     // Prevent memory leaks by removing the event listeners when lightbox closes

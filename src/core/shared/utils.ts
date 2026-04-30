@@ -154,6 +154,7 @@ export function getGallery(group: Map<string, HTMLElement[]>): Gallery {
         thumb: getThumb(val) || undefined,
         title: getTitle(val) || undefined,
         captions: val.dataset.psCaptions,
+        targetEl: innerImg || undefined,
       };
       item.push(o);
     });
