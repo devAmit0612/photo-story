@@ -1,13 +1,18 @@
 import { getWindow } from 'ssr-window';
 
-import resolveEasing from './easing';
 import { prefersReducedMotion } from '../../shared/utils';
-import type { CallbackFunType } from '../../types';
+import { ANIMATION_DURATION } from '../../const';
+import type { CallbackFunType, EasingFunction } from '../../types';
+
+interface ScaleUpContext {
+  resolveEasing(easing: string): EasingFunction;
+}
 
 export default function scaleUp(
+  this: ScaleUpContext,
   el: HTMLElement | null,
   targetEl: HTMLElement | null,
-  duration: number = 300,
+  duration: number = ANIMATION_DURATION,
   easing: string = 'linear',
   cb?: CallbackFunType
 ): boolean | void {
@@ -33,7 +38,7 @@ export default function scaleUp(
   const startY = thumbRect.top + thumbRect.height / 2 - (targetRect.top + targetRect.height / 2);
 
   let startTime: number | null = null;
-  const easingFn = resolveEasing(easing);
+  const easingFn = this.resolveEasing(easing);
   const window = getWindow();
 
   el.style.transformOrigin = 'center center';

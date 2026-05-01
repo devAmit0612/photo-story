@@ -1,4 +1,4 @@
-type EasingFunction = (progress: number) => number;
+import type { EasingFunction } from '../../types';
 
 const clamp = (value: number, min: number, max: number): number =>
   Math.min(Math.max(value, min), max);
@@ -58,25 +58,50 @@ function cubicBezier(x1: number, y1: number, x2: number, y2: number): EasingFunc
 }
 
 function parseCubicBezier(easing: string): EasingFunction | null {
-  const match = easing.match(
-    /^cubic-bezier\(\s*(-?\d*\.?\d+)\s*,\s*(-?\d*\.?\d+)\s*,\s*(-?\d*\.?\d+)\s*,\s*(-?\d*\.?\d+)\s*\)$/i
-  );
+  // This matches any sequence of 4 numbers, positive or negative, with or without decimals.
+  // It completely ignores 'cubic-bezier(', spaces, and parentheses!
+  const matches = easing.match(/-?\d*\.?\d+/g);
 
-  if (!match) {
+  if (!matches || matches.length !== 4) {
     return null;
   }
 
-  const [, x1, y1, x2, y2] = match;
+  // x1 and x2 MUST be clamped between 0 and 1.
+  // Time cannot go backwards or exceed 100%!
+  const x1 = clamp(Number(matches[0]), 0, 1);
+  const y1 = Number(matches[1]);
+  const x2 = clamp(Number(matches[2]), 0, 1);
+  const y2 = Number(matches[3]);
 
-  return cubicBezier(Number(x1), Number(y1), Number(x2), Number(y2));
+  return cubicBezier(x1, y1, x2, y2);
 }
 
-export default function resolveEasing(easing: string = 'linear'): EasingFunction {
-  const normalized = easing.trim().toLowerCase();
+export default {
+  resolveEasing(easing: string = 'linear'): EasingFunction {
+    const normalized = easing.trim().toLowerCase();
 
-  if (namedEasings[normalized]) {
-    return namedEasings[normalized];
-  }
+    if (namedEasings[normalized]) {
+      return namedEasings[normalized];
+    }
 
-  return parseCubicBezier(normalized) || namedEasings.linear;
-}
+    return parseCubicBezier(normalized) || namedEasings.linear;
+  },
+
+  cssEasing(easing: string = 'linear'): string {
+    const clean = easing.trim().toLowerCase();
+
+    // If it's already a valid CSS keyword (ease, linear, etc.) or already has the wrapper
+    if (/^[a-z-]+$/.test(clean) || clean.startsWith('cubic-bezier')) {
+      return clean;
+    }
+
+    // If they passed raw comma-separated numbers: "0.25, 1, 0.5, 1"
+    const matches = clean.match(/-?\d*\.?\d+/g);
+    if (matches && matches.length === 4) {
+      return `cubic-bezier(${matches.join(', ')})`;
+    }
+
+    // Fallback if they passed something totally invalid
+    return 'linear';
+  },
+};

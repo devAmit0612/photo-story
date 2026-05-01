@@ -45,7 +45,7 @@ export default {
     }
 
     // Download Button
-    if (this.options.download && this.options.template.download) {
+    if (this.options.download && this.options.template?.download) {
       // Anchor tags need slightly different handling than buttons
       const dlBtn = this.createButton(
         this.options.template.download,
@@ -63,7 +63,7 @@ export default {
     }
 
     // Close Button
-    if (this.options.template.close) {
+    if (this.options.template?.close) {
       const closeBtn = this.createButton(
         this.options.template.close,
         () => {

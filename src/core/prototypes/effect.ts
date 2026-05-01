@@ -1,6 +1,6 @@
 import { getDocument, getWindow } from 'ssr-window';
 
-import { ANIMATION_DELAY } from '../const';
+import { ANIMATION_DELAY, ANIMATION_EFFECT } from '../const';
 import type { Options } from '../types';
 
 export interface EffectContext {
@@ -33,7 +33,7 @@ export interface EffectContext {
 export default {
   enterEffect(this: EffectContext): void {
     const window = getWindow();
-    const effect = this.options.enterEffect || { name: 'default' };
+    const effect = this.options.enterEffect || { name: ANIMATION_EFFECT };
     const currentMedia = this.options.gallery[this.galleryId!][this.currentIndex];
     const isFade =
       effect.name === 'fade' ||
@@ -75,7 +75,7 @@ export default {
   exitEffect(this: EffectContext): void {
     const document = getDocument();
     const window = getWindow();
-    const effect = this.options.exitEffect || { name: 'default' };
+    const effect = this.options.exitEffect || { name: ANIMATION_EFFECT };
     const currentMedia = this.options.gallery[this.galleryId!][this.currentIndex];
     const isFade =
       effect.name === 'fade' ||

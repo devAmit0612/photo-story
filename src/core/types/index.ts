@@ -7,6 +7,8 @@ export type MediaType = (typeof MEDIA)[number];
 
 export type CallbackFunType = () => void;
 
+export type EasingFunction = (progress: number) => number;
+
 export type Gallery = Record<string, GalleryItem[]>;
 
 export interface BackdropOptions {
@@ -20,11 +22,18 @@ export interface EffectOptions {
   easing?: string;
 }
 
-export interface TransitionOptions extends Omit<EffectOptions, 'name'> {
-  name: TransitionEffectTypes;
-  duration?: number;
-  easing?: string;
-}
+type SharedEffectOptions = Omit<EffectOptions, 'name'>;
+
+export type TransitionOptions = SharedEffectOptions &
+  (
+    | {
+        name: 'scale';
+        scaleAmount?: number;
+      }
+    | {
+        name: Exclude<TransitionEffectTypes, 'scale'>;
+      }
+  );
 
 export interface GalleryItem {
   src: string;

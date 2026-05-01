@@ -12,6 +12,7 @@ export interface ChangeSlideContext {
   media(slideEl: HTMLElement, item: GalleryItem, isCurrent: boolean): void;
   emit(event: string, data?: any): this;
   preload(item: GalleryItem): void;
+  transition(slide: HTMLElement, domIndex: number, shouldAnimate: boolean): boolean | void;
 }
 
 export default function changeSlide(
@@ -94,6 +95,14 @@ export default function changeSlide(
         const img = slide.querySelector(`.${PREFIX}__slide__media`);
         if (img) this.currentMediaEl = img as HTMLElement;
       }
+
+      // Slide transition
+      let shouldAnimate = false;
+      if (!isInitial) {
+        if (direction === 'next' && domIndex !== 2) shouldAnimate = true;
+        if (direction === 'prev' && domIndex !== 0) shouldAnimate = true;
+      }
+      this.transition(slide, domIndex, shouldAnimate);
     }
   });
 

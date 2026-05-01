@@ -11,7 +11,7 @@ import {
   isObject,
 } from './shared/utils';
 
-import type { Options, GalleryItem } from './types';
+import type { Options, GalleryItem, Gallery } from './types';
 
 // Prototypes
 import dom from './prototypes/dom';
@@ -163,7 +163,7 @@ class PhotoStory {
     });
 
     // Build gallery object
-    let gallery = this.options.gallery as any;
+    let gallery = this.options.gallery as Gallery;
 
     if (gallery && Object.keys(gallery).length === 0) {
       this.originalGallery = getGalleryGroup(links);

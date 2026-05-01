@@ -1,12 +1,17 @@
 import { getWindow } from 'ssr-window';
 
-import resolveEasing from './easing';
 import { prefersReducedMotion } from '../../shared/utils';
-import type { CallbackFunType } from '../../types';
+import { ANIMATION_DURATION } from '../../const';
+import type { CallbackFunType, EasingFunction } from '../../types';
+
+interface FadeOutContext {
+  resolveEasing(easing: string): EasingFunction;
+}
 
 export default function fadeOut(
+  this: FadeOutContext,
   el: HTMLElement | null,
-  duration: number = 300,
+  duration: number = ANIMATION_DURATION,
   easing: string = 'linear',
   cb?: CallbackFunType
 ): boolean | void {
@@ -27,7 +32,7 @@ export default function fadeOut(
   el.style.opacity = '1';
 
   const window = getWindow();
-  const easingFn = resolveEasing(easing);
+  const easingFn = this.resolveEasing(easing);
   let startTime: number | null = null;
 
   const fade = (timestamp: number) => {
