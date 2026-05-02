@@ -16,8 +16,8 @@
   .ps__bullet {
     padding: 0;
     display: inline-block;
-    width: var(--#{$prefix}bullets-size, var(--#{$prefix}bullets-width, 0.5rem));
-    height: var(--#{$prefix}bullets-size, var(--#{$prefix}bullets-width, 0.5rem));
+    width: var(--#{$prefix}bullets-size, var(--#{$prefix}bullets-width, 0.625rem));
+    height: var(--#{$prefix}bullets-size, var(--#{$prefix}bullets-width, 0.625rem));
     background-color: var(--#{$prefix}bullets-inactive-bg, $white);
     border-radius: var(--#{$prefix}bullets-border-radius, 50%);
     border: none;
@@ -35,8 +35,8 @@
     }
     &.next,
     &.prev {
-      opacity: calc(var(--#{$prefix}bullets-inactive-opacity, 0.25) * 0.5);
-      transform: scale(calc(var(--#{$prefix}bullets-inactive-scale, 0.25)) * 0.5);
+      opacity: calc(var(--#{$prefix}bullets-inactive-opacity, 0.25) * 2);
+      transform: scale(calc(var(--#{$prefix}bullets-inactive-scale, 0.25) * 2));
     }
     &.enter,
     &.exit {
