@@ -18,7 +18,8 @@ export interface ToolbarContext {
   attachEvents(
     element: HTMLElement | Window | Document,
     events: string,
-    handler: EventListenerOrEventListenerObject
+    handler: EventListenerOrEventListenerObject,
+    options?: AddEventListenerOptions | boolean
   ): void;
   getIdName(name: string): string;
 

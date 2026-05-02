@@ -11,7 +11,7 @@ const defaultOptions: Options = {
   loop: false,
 
   // Bullets
-  bullets: false,
+  bullets: true,
 
   // Amount of preload image
   preload: 1,

@@ -1,0 +1,51 @@
+@use '../../../assets/scss/variables' as *;
+
+.ps {
+  .ps__bullets {
+    position: absolute;
+    left: 0;
+    bottom: var(--#{$prefix}bullets-bottom, 0.75rem);
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    z-index: 2;
+  }
+
+  .ps__bullet {
+    padding: 0;
+    display: inline-block;
+    width: var(--#{$prefix}bullets-size, var(--#{$prefix}bullets-width, 0.5rem));
+    height: var(--#{$prefix}bullets-size, var(--#{$prefix}bullets-width, 0.5rem));
+    background-color: var(--#{$prefix}bullets-inactive-bg, $white);
+    border-radius: var(--#{$prefix}bullets-border-radius, 50%);
+    border: none;
+    cursor: pointer;
+    transition:
+      transform 300ms ease,
+      opacity 300ms ease,
+      background-color 300ms ease;
+    opacity: var(--#{$prefix}bullets-inactive-opacity, 0.25);
+    transform: scale(var(--#{$prefix}bullets-inactive-scale, 0.25));
+    &.active {
+      background-color: var(--#{$prefix}bullets-active-bg, $white);
+      opacity: var(--#{$prefix}bullets-active-opacity, 1);
+      transform: scale(var(--#{$prefix}bullets-active-scale, 1));
+    }
+    &.next,
+    &.prev {
+      opacity: calc(var(--#{$prefix}bullets-inactive-opacity, 0.25) * 0.5);
+      transform: scale(calc(var(--#{$prefix}bullets-inactive-scale, 0.25)) * 0.5);
+    }
+    &.enter,
+    &.exit {
+      opacity: 0 !important;
+      transform: scale(0) !important;
+    }
+  }
+}
+
+#ps_slides {
+  padding-bottom: 2rem;
+}

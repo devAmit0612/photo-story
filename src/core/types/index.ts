@@ -65,6 +65,12 @@ export interface NavigationOptions {
   prevIcon?: string;
 }
 
+export interface BulletsOptions {
+  enabled: boolean;
+  dynamicAmount?: number;
+  renderBullet?: (index: number, className: string, isActive: boolean) => string;
+}
+
 export interface Options {
   gallery: Gallery;
 
@@ -74,15 +80,13 @@ export interface Options {
   captions?: boolean;
   loop?: boolean;
 
-  // Bullets
-  bullets?: boolean;
-
   // Amount of preload image
   preload?: number;
 
   // Modules
   fullscreen?: boolean | FullscreenOptions;
   navigation?: boolean | NavigationOptions;
+  bullets?: boolean | BulletsOptions;
 
   // Effects
   enterEffect?: EffectOptions;

@@ -13,6 +13,8 @@ type JQueryElementTypes = {
   [index: number]: HTMLElement;
 };
 
+let isPassiveSupported: boolean | null = null;
+
 export function prefersReducedMotion(): boolean {
   const window = getWindow();
 
@@ -24,9 +26,12 @@ export function prefersReducedMotion(): boolean {
 }
 
 export function checkPassiveListener(): boolean {
-  const window = getWindow();
+  if (isPassiveSupported !== null) return isPassiveSupported;
 
-  if (!window.addEventListener || !window.removeEventListener) return false;
+  const window = getWindow();
+  if (!window.addEventListener || !window.removeEventListener) {
+    return (isPassiveSupported = false);
+  }
 
   let supportsPassive = false;
   try {
@@ -38,7 +43,8 @@ export function checkPassiveListener(): boolean {
     window.addEventListener('testPassive', null as any, opts);
     window.removeEventListener('testPassive', null as any, opts);
   } catch (e) {}
-  return supportsPassive;
+
+  return (isPassiveSupported = supportsPassive);
 }
 
 export function deleteProps(obj: Record<string, unknown>): void {

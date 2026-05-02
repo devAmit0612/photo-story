@@ -1,7 +1,8 @@
+import Bullets from './bullets';
 import Fullscreen from './fullscreen';
 import Navigation from './navigation';
 
-const Modules = [Fullscreen, Navigation];
+const Modules = [Bullets, Fullscreen, Navigation];
 
 export default {
   Modules,

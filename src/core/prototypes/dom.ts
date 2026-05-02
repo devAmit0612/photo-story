@@ -18,7 +18,8 @@ export interface DOMContext {
   attachEvents(
     element: HTMLElement | Window | Document,
     events: string,
-    handler: EventListenerOrEventListenerObject
+    handler: EventListenerOrEventListenerObject,
+    options?: AddEventListenerOptions | boolean
   ): void;
   createEl(classes?: string, tag?: string): HTMLElement;
   hasClass(el: HTMLElement, className: string): boolean;

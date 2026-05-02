@@ -84,12 +84,14 @@ interface PhotoStory {
   toolbar(gallery: GalleryItem[]): HTMLElement;
   downloadURL(): void;
   addClass(el: HTMLElement, className: string): void;
+  removeClass(el: HTMLElement, className: string): void;
   getIdName(name: string): string;
   getChildByClassName(name: string): HTMLElement[];
   attachEvents(
     element: HTMLElement | Window | Document,
     events: string,
-    handler: EventListenerOrEventListenerObject
+    handler: EventListenerOrEventListenerObject,
+    options?: AddEventListenerOptions | boolean
   ): void;
   detachEvents(element: HTMLElement | Window | Document, events: string): void;
   on(events: string, handler: Function): this;
@@ -174,7 +176,7 @@ class PhotoStory {
     Object.assign(this.options.gallery, gallery);
 
     this.events = {
-      click: 'click touchstart',
+      click: 'click',
     };
 
     // Attach core click events
