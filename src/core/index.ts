@@ -57,6 +57,7 @@ interface PhotoStory {
   options: Options;
   element: HTMLElement[];
   currentIndex: number;
+  previousIndex: number | null;
   originalGallery: Map<string, HTMLElement[]>;
   eventsListeners: Record<string, Function[]>;
   modules: PhotoStoryModule[];
@@ -178,6 +179,7 @@ class PhotoStory {
     this.events = {
       click: 'click',
     };
+    this.previousIndex = null;
 
     // Attach core click events
     links.forEach((link) => {
@@ -249,6 +251,7 @@ class PhotoStory {
     this.emit('close');
     this.exitEffect();
 
+    this.previousIndex = null;
     this.currentIndex = 0;
     this.galleryId = null;
 

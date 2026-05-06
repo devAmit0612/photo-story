@@ -4,6 +4,7 @@ import type { GalleryItem, Options } from '../../types';
 
 export interface ChangeSlideContext {
   currentIndex: number;
+  previousIndex: number | null;
   galleryId: string | null;
   options: Options;
   slidesEl: HTMLElement;
@@ -25,6 +26,8 @@ export default function changeSlide(
   const slideWrapperEl = this.slidesEl.querySelector(`.${PREFIX}__slides__wrapper`) as HTMLElement;
   const gallery = this.options.gallery[this.galleryId];
   const total = gallery.length;
+  const previousIndex = this.currentIndex;
+  this.previousIndex = previousIndex;
 
   // Detect if the user clicked a bullet point to jump multiple slides at once
   const jumpSize = Math.abs(newIndex - this.currentIndex);
@@ -42,6 +45,12 @@ export default function changeSlide(
     if (newIndex < this.currentIndex || (this.currentIndex === 0 && newIndex === total - 1))
       direction = 'prev';
   }
+
+  const isLoop =
+    this.options.loop &&
+    !isInitial &&
+    ((previousIndex === total - 1 && newIndex === 0) ||
+      (previousIndex === 0 && newIndex === total - 1));
 
   this.currentIndex = newIndex;
   if (gallery[this.currentIndex] && gallery[this.currentIndex].targetEl) {
@@ -83,9 +92,10 @@ export default function changeSlide(
 
     if (sIndex !== null && gallery[sIndex]) {
       // Only inject media into the NEW slide that just cycled in.
-      // If it is the initial load or a large jump, reload all 3.
+      // If it is the initial load, a large jump, or a loop wrap, reload all 3.
       if (
         isInitial ||
+        isLoop ||
         (direction === 'next' && domIndex === 2) ||
         (direction === 'prev' && domIndex === 0)
       ) {
@@ -106,7 +116,7 @@ export default function changeSlide(
     }
   });
 
-  if (!isInitial) {
+  if (!isInitial || this.previousIndex !== newIndex) {
     this.emit('change');
   }
 
